@@ -40,6 +40,9 @@
     <Filter Include="Source Files\common">
       <UniqueIdentifier>{42fd860c-8851-42ea-81e1-ffda08a6174d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\alien">
+      <UniqueIdentifier>{27dc89c9-0506-4745-b7ec-52c71818476e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\dlls\aflock.cpp">
@@ -357,6 +360,12 @@
     <ClCompile Include="..\dlls\weapons_shared.cpp">
       <Filter>Source Files\dlls</Filter>
     </ClCompile>
+    <ClCompile Include="..\dlls\alien_triggers.cpp">
+      <Filter>Source Files\alien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\alien_util.cpp">
+      <Filter>Source Files\alien</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\dlls\doors.h">
@@ -616,6 +625,9 @@
     </ClInclude>
     <ClInclude Include="..\common\winsani_out.h">
       <Filter>Header Files\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\alien_util.h">
+      <Filter>Source Files\alien</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

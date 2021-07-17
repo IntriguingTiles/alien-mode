@@ -110,6 +110,8 @@
     <ClCompile Include="..\dlls\aflock.cpp" />
     <ClCompile Include="..\dlls\agrunt.cpp" />
     <ClCompile Include="..\dlls\airtank.cpp" />
+    <ClCompile Include="..\dlls\alien_triggers.cpp" />
+    <ClCompile Include="..\dlls\alien_util.cpp" />
     <ClCompile Include="..\dlls\animating.cpp" />
     <ClCompile Include="..\dlls\animation.cpp" />
     <ClCompile Include="..\dlls\apache.cpp" />
@@ -248,6 +250,7 @@
     <ClInclude Include="..\common\winsani_out.h" />
     <ClInclude Include="..\dlls\activity.h" />
     <ClInclude Include="..\dlls\activitymap.h" />
+    <ClInclude Include="..\dlls\alien_util.h" />
     <ClInclude Include="..\dlls\animation.h" />
     <ClInclude Include="..\dlls\basemonster.h" />
     <ClInclude Include="..\dlls\cbase.h" />
