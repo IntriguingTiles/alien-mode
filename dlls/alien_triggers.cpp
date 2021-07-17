@@ -90,3 +90,44 @@ void CTriggerPlayerFreeze::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, U
 			UTIL_FreezePlayer( pPlayer, m_bUnFrozen );
 	}
 }
+
+// this entity is another gearbox moment
+// there's just so much weird stuff here
+class CTriggerPlayerISlave : public CBaseEntity
+{
+	void Spawn( void );
+	void EXPORT TriggerUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void EXPORT TriggerThink( void );
+};
+
+LINK_ENTITY_TO_CLASS( trigger_player_islave, CTriggerPlayerISlave );
+
+void CTriggerPlayerISlave::Spawn()
+{
+	pev->movetype = MOVETYPE_NONE;
+	pev->solid = SOLID_NOT;
+	pev->takedamage = DAMAGE_NO;
+	pev->effects = EF_NODRAW;
+	
+	SetUse( &CTriggerPlayerISlave::TriggerUse );
+}
+
+void CTriggerPlayerISlave::TriggerUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+{
+	SetThink( &CTriggerPlayerISlave::TriggerThink );
+	pev->nextthink = gpGlobals->time + 0.1;
+}
+
+void CTriggerPlayerISlave::TriggerThink()
+{
+	CBaseEntity *pPlayer = CBaseEntity::Instance( g_engfuncs.pfnPEntityOfEntIndex( 1 ) );
+
+	if ( !pPlayer || !pPlayer->IsPlayer() )
+	{
+		pev->nextthink = gpGlobals->time + 0.3;
+	}
+	else
+	{
+		SUB_UseTargets( this, USE_ON, 0 );
+	}
+}
