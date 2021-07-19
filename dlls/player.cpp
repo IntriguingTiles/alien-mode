@@ -2807,7 +2807,7 @@ void CBasePlayer::Spawn()
 	m_iStepLeft = 0;
 	m_flFieldOfView		= 0.5;// some monsters use this to determine whether or not the player is looking at them.
 
-	m_bloodColor	= BLOOD_COLOR_RED;
+	m_bloodColor	= BLOOD_COLOR_YELLOW;
 	m_flNextAttack	= UTIL_WeaponTimeBase();
 	StartSneaking();
 
@@ -2948,7 +2948,7 @@ int CBasePlayer::Restore( CRestore &restore )
 	pev->fixangle = TRUE;           // turn this way immediately
 
 // Copied from spawn() for now
-	m_bloodColor	= BLOOD_COLOR_RED;
+	m_bloodColor	= BLOOD_COLOR_YELLOW;
 
     g_ulModelIndexPlayer = pev->modelindex;
 
