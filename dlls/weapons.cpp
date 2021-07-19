@@ -577,23 +577,26 @@ void CBasePlayerItem::DefaultTouch( CBaseEntity *pOther )
 
 	CBasePlayer *pPlayer = (CBasePlayer *)pOther;
 
-	// can I have this?
-	if ( !g_pGameRules->CanHavePlayerItem( pPlayer, this ) )
+	if ( gEvilImpulse101 || FClassnameIs( pev, "weapon_islave" ) )
 	{
-		if ( gEvilImpulse101 )
+		// can I have this?
+		if ( !g_pGameRules->CanHavePlayerItem( pPlayer, this ) )
 		{
-			UTIL_Remove( this );
+			if ( gEvilImpulse101 )
+			{
+				UTIL_Remove( this );
+			}
+			return;
 		}
-		return;
-	}
 
-	if (pOther->AddPlayerItem( this ))
-	{
-		AttachToPlayer( pPlayer );
-		EMIT_SOUND(ENT(pPlayer->pev), CHAN_ITEM, "items/gunpickup2.wav", 1, ATTN_NORM);
-	}
+		if (pOther->AddPlayerItem( this ))
+		{
+			AttachToPlayer( pPlayer );
+			EMIT_SOUND(ENT(pPlayer->pev), CHAN_ITEM, "items/gunpickup2.wav", 1, ATTN_NORM);
+		}
 
-	SUB_UseTargets( pOther, USE_TOGGLE, 0 ); // UNDONE: when should this happen?
+		SUB_UseTargets( pOther, USE_TOGGLE, 0 ); // UNDONE: when should this happen?
+	}
 }
 
 void CBasePlayerItem::DestroyItem()
@@ -945,25 +948,28 @@ void CBasePlayerAmmo :: DefaultTouch( CBaseEntity *pOther )
 		return;
 	}
 
-	if (AddAmmo( pOther ))
+	if (gEvilImpulse101)
 	{
-		if ( g_pGameRules->AmmoShouldRespawn( this ) == GR_AMMO_RESPAWN_YES )
+		if (AddAmmo( pOther ))
 		{
-			Respawn();
+			if ( g_pGameRules->AmmoShouldRespawn( this ) == GR_AMMO_RESPAWN_YES )
+			{
+				Respawn();
+			}
+			else
+			{
+				SetTouch( NULL );
+				SetThink(&CBasePlayerAmmo::SUB_Remove);
+				pev->nextthink = gpGlobals->time + .1;
+			}
 		}
-		else
+		else if (gEvilImpulse101)
 		{
+			// evil impulse 101 hack, kill always
 			SetTouch( NULL );
 			SetThink(&CBasePlayerAmmo::SUB_Remove);
 			pev->nextthink = gpGlobals->time + .1;
 		}
-	}
-	else if (gEvilImpulse101)
-	{
-		// evil impulse 101 hack, kill always
-		SetTouch( NULL );
-		SetThink(&CBasePlayerAmmo::SUB_Remove);
-		pev->nextthink = gpGlobals->time + .1;
 	}
 }
 
