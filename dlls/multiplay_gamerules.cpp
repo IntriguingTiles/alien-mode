@@ -561,31 +561,8 @@ void CHalfLifeMultiplay :: PlayerThink( CBasePlayer *pPlayer )
 //=========================================================
 void CHalfLifeMultiplay :: PlayerSpawn( CBasePlayer *pPlayer )
 {
-	BOOL		addDefault;
-	CBaseEntity	*pWeaponEntity = NULL;
-
-	//Ensure the player switches to the Glock on spawn regardless of setting
-	const int originalAutoWepSwitch = pPlayer->m_iAutoWepSwitch;
-	pPlayer->m_iAutoWepSwitch = 1;
-
 	pPlayer->pev->weapons |= (1<<WEAPON_SUIT);
-	
-	addDefault = TRUE;
-
-	while ( pWeaponEntity = UTIL_FindEntityByClassname( pWeaponEntity, "game_player_equip" ))
-	{
-		pWeaponEntity->Touch( pPlayer );
-		addDefault = FALSE;
-	}
-
-	if ( addDefault )
-	{
-		pPlayer->GiveNamedItem( "weapon_crowbar" );
-		pPlayer->GiveNamedItem( "weapon_9mmhandgun" );
-		pPlayer->GiveAmmo( 68, "9mm", _9MM_MAX_CARRY );// 4 full reloads
-	}
-
-	pPlayer->m_iAutoWepSwitch = originalAutoWepSwitch;
+	pPlayer->GiveNamedItem( "weapon_islave" );
 }
 
 //=========================================================

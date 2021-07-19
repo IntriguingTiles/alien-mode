@@ -119,6 +119,7 @@ float CHalfLifeRules::FlPlayerFallDamage( CBasePlayer *pPlayer )
 //=========================================================
 void CHalfLifeRules :: PlayerSpawn( CBasePlayer *pPlayer )
 {
+	pPlayer->GiveNamedItem( "weapon_islave" );
 }
 
 //=========================================================
