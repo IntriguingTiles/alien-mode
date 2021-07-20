@@ -61,6 +61,8 @@ struct skilldata_t
 	float slaveDmgClaw;
 	float slaveDmgClawrake;
 	float slaveDmgZap;
+	float plrDmgISlave;
+	float plrDmgISlaveZap;
 
 	float ichthyosaurHealth;
 	float ichthyosaurDmgShake;

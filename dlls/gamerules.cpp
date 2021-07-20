@@ -223,6 +223,10 @@ void CGameRules::RefreshSkillData ()
 
 // PLAYER WEAPONS
 
+	// ISlave weapon
+	gSkillData.plrDmgISlave = GetSkillCvar( "sk_plr_islave" );
+	gSkillData.plrDmgISlaveZap = GetSkillCvar( "sk_plr_islavezap" );
+
 	// Crowbar whack
 	gSkillData.plrDmgCrowbar = GetSkillCvar( "sk_plr_crowbar");
 

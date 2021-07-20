@@ -283,6 +283,15 @@ cvar_t	sk_sentry_health3 = {"sk_sentry_health3","0"};
 
 // PLAYER WEAPONS
 
+// ISlave weapon
+cvar_t sk_plr_islave1 = {"sk_plr_islave1","0"};
+cvar_t sk_plr_islave2 = {"sk_plr_islave2","0"};
+cvar_t sk_plr_islave3 = {"sk_plr_islave3","0"};
+
+cvar_t sk_plr_islavezap1 = {"sk_plr_islavezap1","0"};
+cvar_t sk_plr_islavezap2 = {"sk_plr_islavezap2","0"};
+cvar_t sk_plr_islavezap3 = {"sk_plr_islavezap3","0"};
+
 // Crowbar whack
 cvar_t	sk_plr_crowbar1 = {"sk_plr_crowbar1","0"};
 cvar_t	sk_plr_crowbar2 = {"sk_plr_crowbar2","0"};
@@ -725,6 +734,15 @@ void GameDLLInit()
 
 
 	// PLAYER WEAPONS
+
+	// ISlave weapon
+	CVAR_REGISTER ( &sk_plr_islave1 );// {"sk_plr_islave1","0"};
+	CVAR_REGISTER ( &sk_plr_islave2 );// {"sk_plr_islave2","0"};
+	CVAR_REGISTER ( &sk_plr_islave3 );// {"sk_plr_islave3","0"};
+
+	CVAR_REGISTER ( &sk_plr_islavezap1 );// {"sk_plr_islavezap1","0"};
+	CVAR_REGISTER ( &sk_plr_islavezap2 );// {"sk_plr_islavezap2","0"};
+	CVAR_REGISTER ( &sk_plr_islavezap3 );// {"sk_plr_islavezap3","0"};
 
 	// Crowbar whack
 	CVAR_REGISTER ( &sk_plr_crowbar1 );// {"sk_plr_crowbar1","0"};

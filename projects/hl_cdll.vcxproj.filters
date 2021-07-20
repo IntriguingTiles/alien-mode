@@ -58,6 +58,9 @@
     <Filter Include="Header Files\engine">
       <UniqueIdentifier>{ebcb0f66-49b6-4e55-9a97-f6720cade9ec}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\alien">
+      <UniqueIdentifier>{eb55381e-a7f4-4441-8e4f-98fc9caf92a1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\dlls\crossbow.cpp">
@@ -305,6 +308,9 @@
     </ClCompile>
     <ClCompile Include="..\dlls\weapons_shared.cpp">
       <Filter>Source Files\_hl\dlls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\weapon_islave.cpp">
+      <Filter>Source Files\alien</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

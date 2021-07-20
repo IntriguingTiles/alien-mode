@@ -77,6 +77,7 @@ public:
 #define WEAPON_TRIPMINE			13
 #define	WEAPON_SATCHEL			14
 #define	WEAPON_SNARK			15
+#define WEAPON_ISLAVE			16
 
 #define WEAPON_ALLWEAPONS		(~(1<<WEAPON_SUIT))
 
@@ -556,6 +557,68 @@ public:
 	}
 private:
 	unsigned short m_usCrowbar;
+};
+
+enum slave_e
+{
+	SLAVE_IDLE1 = 0,
+	SLAVE_IDLE2,
+	SLAVE_ATTACK1HIT,
+	SLAVE_ATTACK1MISS,
+	SLAVE_ATTACK2MISS,
+	SLAVE_ATTACK2HIT,
+	SLAVE_ATTACK3MISS,
+	SLAVE_ATTACK3HIT,
+	SLAVE_CHARGE,
+	SLAVE_CHARGE_LOOP,
+	SLAVE_ZAP,
+	SLAVE_RETURN
+};
+
+class CWeaponISlave : public CBasePlayerWeapon
+{
+public:
+	#ifndef CLIENT_DLL
+	int		Save( CSave& save );
+	int		Restore( CRestore& restore );
+	static	TYPEDESCRIPTION m_SaveData[];
+#endif
+
+	void Spawn( void );
+	void Precache( void );
+	int iItemSlot( void ) { return 1; }
+	int GetItemInfo(ItemInfo *p);
+
+	void PrimaryAttack( void );
+	void SecondaryAttack( void );
+	BOOL Deploy( void );
+	void Holster( int skiplocal = 0 );
+	void WeaponIdle( void );
+	void ArmBeam( int side );
+	void BeamGlow( void );
+	void ChargeZap( void );
+	void FailZap( void );
+	void ClearBeams( void );
+	void ShootBeam( void );
+	void EXPORT ClearBeamsThink( void );
+	void ZapBeam ( int side );
+	int m_iSwing;
+	TraceResult m_trHit;
+	float m_flZapTime;
+	CBeam* m_pBeam[8];
+	CBeam* m_pBeam2[4];
+	int m_iBeams;
+	float m_flUpdateBeamTime;
+	int m_iHudState;
+
+	virtual BOOL UseDecrement( void )
+	{ 
+#if defined( CLIENT_WEAPONS )
+		return TRUE;
+#else
+		return FALSE;
+#endif
+	}
 };
 
 enum python_e

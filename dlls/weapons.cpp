@@ -356,6 +356,7 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon( "weapon_hornetgun" );
 #endif
 
+	UTIL_PrecacheOtherWeapon( "weapon_islave" );
 
 #if !defined( OEM_BUILD ) && !defined( HLDEMO_BUILD )
 	if ( g_pGameRules->IsDeathmatch() )
@@ -1411,6 +1412,14 @@ void CBasePlayerWeapon::PrintState()
 	ALERT( at_console, "m_iclip:  %i\n", m_iClip );
 }
 
+TYPEDESCRIPTION CWeaponISlave::m_SaveData[] =
+{
+	DEFINE_FIELD( CWeaponISlave, m_iSwing, FIELD_INTEGER ),
+	DEFINE_FIELD( CWeaponISlave, m_flZapTime, FIELD_TIME ),
+	DEFINE_FIELD( CWeaponISlave, m_flUpdateBeamTime, FIELD_TIME ),
+	DEFINE_FIELD( CWeaponISlave, m_iHudState, FIELD_INTEGER ),
+};
+IMPLEMENT_SAVERESTORE( CWeaponISlave, CBasePlayerWeapon );
 
 TYPEDESCRIPTION	CRpg::m_SaveData[] = 
 {
