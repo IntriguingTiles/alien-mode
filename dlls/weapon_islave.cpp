@@ -22,11 +22,20 @@
 #include "player.h"
 #include "gamerules.h"
 #include "alien_util.h"
+#include "UserMessages.h"
 
 #define CROWBAR_BODYHIT_VOLUME 128
 #define CROWBAR_WALLHIT_VOLUME 512
 
 LINK_ENTITY_TO_CLASS( weapon_islave, CWeaponISlave );
+
+#ifndef CLIENT_DLL
+	#define SEND_HUD_MSG() MESSAGE_BEGIN( MSG_ONE, gmsgISlaveHud, NULL, m_pPlayer->pev ); \
+				WRITE_BYTE( m_iHudState ); \
+			MESSAGE_END();
+#else
+	#define SEND_HUD_MSG()
+#endif
 
 void CWeaponISlave::Spawn()
 {
@@ -100,7 +109,7 @@ int CWeaponISlave::GetItemInfo( ItemInfo *p )
 BOOL CWeaponISlave::Deploy()
 {
 	m_iHudState = 0;
-	// send hud message
+	SEND_HUD_MSG();
 	return DefaultDeploy( "models/v_slave.mdl", "models/p_crowbar.mdl", SLAVE_IDLE1, "crowbar" );
 }
 
@@ -110,7 +119,7 @@ void CWeaponISlave::Holster( int skiplocal /* = 0 */ )
 	ClearBeams();
 	m_flZapTime = 0.0;
 	m_iHudState = 0;
-	// send hud message
+	SEND_HUD_MSG();
 	m_pPlayer->pev->viewmodel = 0;
 	m_pPlayer->pev->weaponmodel = 0;
 }
@@ -132,7 +141,7 @@ void CWeaponISlave::PrimaryAttack()
 	if ( m_iHudState != 0 )
 	{
 		m_iHudState = 0;
-		// send hud message
+		SEND_HUD_MSG();
 	}
 
 	m_flZapTime = 0.0;
@@ -309,7 +318,7 @@ void CWeaponISlave::SecondaryAttack()
 				return;
 			}
 			m_iHudState = 3;
-			// send hud message
+			SEND_HUD_MSG();
 			m_flZapTime = gpGlobals->time + 0.5;
 			SendWeaponAnim( SLAVE_CHARGE_LOOP );
 		}
@@ -320,7 +329,7 @@ void CWeaponISlave::SecondaryAttack()
 		if ( m_iHudState == 2 && ( m_flZapTime - gpGlobals->time <= 0.65f ) )
 		{
 			m_iHudState = 1;
-			// send hud message
+			SEND_HUD_MSG();
 		}
 
 		if ( m_flUpdateBeamTime < gpGlobals->time )
@@ -362,7 +371,7 @@ void CWeaponISlave::ChargeZap()
 #endif
 
 	m_iHudState = 2;
-	// send hud message
+	SEND_HUD_MSG();
 	m_flUpdateBeamTime = gpGlobals->time;
 }
 
@@ -371,7 +380,7 @@ void CWeaponISlave::FailZap()
 	m_flZapTime = 0.0;
 	m_iHudState = 0;
 	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.5;
-	// send hud message
+	SEND_HUD_MSG();
 	SendWeaponAnim( SLAVE_RETURN );
 	ClearBeams();
 }
@@ -595,7 +604,7 @@ void CWeaponISlave::WeaponIdle( void )
 	{
 		ShootBeam();
 		m_iHudState = 0;
-		// send hud message
+		SEND_HUD_MSG();
 		return;
 	}
 

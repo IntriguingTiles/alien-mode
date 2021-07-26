@@ -536,6 +536,29 @@ private:
 //
 //-----------------------------------------------------
 //
+class CHudISlave : public CHudBase
+{
+public:
+	int Init();
+	void Reset();
+	int VidInit();
+	int Draw( float flTime );
+	void DrawCrosshair();
+	int MsgFunc_ISlaveHud( const char *pszName, int iSize, void *pbuf );
+
+private:
+	int m_HUD_islave_center;
+	int m_HUD_islave_charged;
+	int m_HUD_islave_outer;
+	int m_HUD_islave_inner;
+	int m_HUD_islave_health;
+	int m_iHealth;
+	int m_iHudState;
+};
+
+//
+//-----------------------------------------------------
+//
 
 
 class CHud
@@ -614,6 +637,7 @@ public:
 	CHudTextMessage m_TextMessage;
 	CHudStatusIcons m_StatusIcons;
 	CHudBenchmark	m_Benchmark;
+	CHudISlave		m_ISlave;
 
 	void Init();
 	void VidInit();

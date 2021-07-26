@@ -50,6 +50,7 @@ extern int gmsgSetFOV;
 extern int gmsgShowMenu;
 extern int gmsgGeigerRange;
 extern int gmsgTeamNames;
+extern int gmsgISlaveHud;
 
 extern int gmsgStatusText;
 extern int gmsgStatusValue;
