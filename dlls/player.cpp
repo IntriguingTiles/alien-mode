@@ -1776,10 +1776,11 @@ void CBasePlayer::PreThink()
 	ItemPreFrame( );
 	WaterMove();
 
-	if ( g_pGameRules && g_pGameRules->FAllowFlashlight() )
+	// silly!
+	/*if ( g_pGameRules && g_pGameRules->FAllowFlashlight() )
 		m_iHideHUD &= ~HIDEHUD_FLASHLIGHT;
 	else
-		m_iHideHUD |= HIDEHUD_FLASHLIGHT;
+		m_iHideHUD |= HIDEHUD_FLASHLIGHT;*/
 
 	if (m_bResetViewEntity)
 	{
