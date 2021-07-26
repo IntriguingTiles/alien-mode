@@ -69,6 +69,15 @@ void CWeaponISlave::Precache()
 	PRECACHE_SOUND( "scientist/gibberish01.wav" );
 	PRECACHE_SOUND( "scientist/gibberish02.wav" );
 	PRECACHE_SOUND( "scientist/gibberish03.wav" );
+	PRECACHE_SOUND( "scientist/gibberish04.wav" );
+	PRECACHE_SOUND( "scientist/gibberish05.wav" );
+	PRECACHE_SOUND( "scientist/gibberish06.wav" );
+	PRECACHE_SOUND( "scientist/gibberish07.wav" );
+	PRECACHE_SOUND( "scientist/gibberish08.wav" );
+	PRECACHE_SOUND( "scientist/gibberish09.wav" );
+	PRECACHE_SOUND( "scientist/gibberish10.wav" );
+	PRECACHE_SOUND( "scientist/gibberish11.wav" );
+	PRECACHE_SOUND( "scientist/gibberish12.wav" );
 
 	for ( int i = 0; i < 8; i++ )
 	{
@@ -299,7 +308,10 @@ void CWeaponISlave::PrimaryAttack()
 
 	// gearbox moment: this overwrites the previously set primary attack delays
 	// although this might be intentional
-	m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.3;
+#ifndef CLIENT_DLL
+	if ( CVAR_GET_FLOAT( "sv_alien_alt_melee" ) == 0 )
+#endif
+		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.3;
 }
 
 void CWeaponISlave::SecondaryAttack()

@@ -118,11 +118,20 @@ dynpitchvol_t rgdpvpreset[CDPVPRESETMAX] =
 {27,128,	 90,	10,		10,		10,		1,		20,		40,		1,		5,		10,		20,		0,		0,0,0,0,0,0,0,0,0,0}
 };
 
-const char* gibberish[3] =
+const char* gibberish[12] =
 {
 	"scientist/gibberish01.wav",
 	"scientist/gibberish02.wav",
-	"scientist/gibberish03.wav"
+	"scientist/gibberish03.wav",
+	"scientist/gibberish04.wav",
+	"scientist/gibberish05.wav",
+	"scientist/gibberish06.wav",
+	"scientist/gibberish07.wav",
+	"scientist/gibberish08.wav",
+	"scientist/gibberish09.wav",
+	"scientist/gibberish10.wav",
+	"scientist/gibberish11.wav",
+	"scientist/gibberish12.wav",
 };
 
 class CAmbientGeneric : public CBaseEntity
@@ -1430,7 +1439,7 @@ BOOL AlienModeSounds(edict_t *entity, int channel, const char *sample, float vol
 				if ( strstr( sample, "pain" ) || strstr( sample, "scream" ))
 					return FALSE;
 
-				EMIT_SOUND_DYN2( entity, channel, gibberish[ RANDOM_LONG( 0, 2 ) ], volume, attenuation, flags, pitch );
+				EMIT_SOUND_DYN2( entity, channel, gibberish[ RANDOM_LONG( 0, CVAR_GET_FLOAT( "sv_alien_gibberish" ) == 0 ? 2 : 11 ) ], volume, attenuation, flags, pitch );
 				return TRUE;
 			}
 		}

@@ -465,6 +465,10 @@ cvar_t	sk_player_leg3	= { "sk_player_leg3","1" };
 
 // END Cvars for Skill Level settings
 
+// alien mode stuff
+cvar_t sv_alien_alt_melee = { "sv_alien_alt_melee","0" };
+cvar_t sv_alien_gibberish = { "sv_alien_gibberish","0" };
+
 // Register your console variables here
 // This gets called one time when the game is initialied
 void GameDLLInit()
@@ -914,6 +918,10 @@ void GameDLLInit()
 	CVAR_REGISTER ( &sk_player_leg2 );
 	CVAR_REGISTER ( &sk_player_leg3 );
 // END REGISTER CVARS FOR SKILL LEVEL STUFF
+
+// alien mode stuff
+	CVAR_REGISTER ( &sv_alien_alt_melee );
+	CVAR_REGISTER ( &sv_alien_gibberish );
 
 	SERVER_COMMAND( "exec skill.cfg\n" );
 }
