@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdio.h>
 #include "parsemsg.h"
+#include "screenfade.h"
 
 DECLARE_MESSAGE( m_ISlave, ISlaveHud )
 
@@ -54,6 +55,16 @@ int CHudISlave::MsgFunc_ISlaveHud( const char *pszName, int iSize, void *pbuf )
 
 int CHudISlave::Draw( float flTime )
 {
+	// hack to disable hud for c4a1 credits
+	if ( strstr( gEngfuncs.pfnGetLevelName(), "c4a1" ) )
+	{
+		screenfade_t fade;
+		gEngfuncs.pfnGetScreenFade( &fade );
+
+		if ( fade.fadeEnd != 0 && fade.fadeSpeed < 0 && gEngfuncs.GetClientTime() > fade.fadeEnd )
+			return 1;
+	}
+
 	DrawCrosshair();
 	int y = ( ScreenHeight - gHUD.m_iFontHeight ) - gHUD.m_iFontHeight / 2;
 	m_iHealth = gHUD.m_Health.m_iHealth;
