@@ -2771,7 +2771,9 @@ void CBasePlayer::Spawn()
 	
 	m_flNextChatTime = gpGlobals->time;
 
-	g_pGameRules->PlayerSpawn( this );
+	// hack to fix bug in transition to unforseen consequences
+	if ( !HasWeapons() )
+		g_pGameRules->PlayerSpawn( this );
 }
 
 
@@ -2816,6 +2818,10 @@ void CBasePlayer :: Precache()
 
 	if ( gInitHUD )
 		m_fInitHUD = TRUE;
+
+	// hack to fix bug in transition to unforseen consequences
+	if ( !HasWeapons() )
+		g_pGameRules->PlayerSpawn( this );
 }
 
 
