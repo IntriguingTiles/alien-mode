@@ -67,6 +67,10 @@ int CHudISlave::Draw( float flTime )
 
 	DrawCrosshair();
 	int y = ( ScreenHeight - gHUD.m_iFontHeight ) - gHUD.m_iFontHeight / 2;
+
+	if ( CVAR_GET_FLOAT( "cl_alien_hud_scale" ) >= 1 )
+		y = ScreenHeight - gHUD.GetSpriteRect( m_HUD_islave_health ).bottom;
+
 	m_iHealth = gHUD.m_Health.m_iHealth;
 	wrect_t rect = gHUD.GetSpriteRect( m_HUD_islave_health );
 	int x = ScreenWidth / 2 - ( rect.right - rect.left ) / 2;

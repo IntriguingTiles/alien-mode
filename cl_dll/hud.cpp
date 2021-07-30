@@ -85,6 +85,7 @@ cvar_t *cl_lw = NULL;
 cvar_t* cl_rollangle = nullptr;
 cvar_t* cl_rollspeed = nullptr;
 cvar_t* cl_bobtilt = nullptr;
+cvar_t *cl_alien_hud_scale = NULL;
 
 void ShutdownInput ();
 
@@ -328,6 +329,7 @@ void CHud :: Init()
 	cl_rollangle = CVAR_CREATE("cl_rollangle", "2.0", FCVAR_ARCHIVE);
 	cl_rollspeed = CVAR_CREATE("cl_rollspeed", "200", FCVAR_ARCHIVE);
 	cl_bobtilt = CVAR_CREATE("cl_bobtilt", "0", FCVAR_ARCHIVE);
+	cl_alien_hud_scale = CVAR_CREATE( "cl_alien_hud_scale", "2", FCVAR_ARCHIVE );
 
 	m_pSpriteList = NULL;
 
@@ -428,7 +430,18 @@ void CHud :: VidInit()
 	if ( !m_pSpriteList )
 	{
 		// we need to load the hud.txt, and all sprites within
-		m_pSpriteList = SPR_GetList("sprites/hud.txt", &m_iSpriteCountAllRes);
+		switch ( (int)( cl_alien_hud_scale->value ) )
+		{
+			case 1:
+				m_pSpriteList = SPR_GetList( "sprites/hud_2x.txt", &m_iSpriteCountAllRes );
+				break;
+			case 2:
+				m_pSpriteList = SPR_GetList( "sprites/hud_3x.txt", &m_iSpriteCountAllRes );
+				break;
+			default:
+				m_pSpriteList = SPR_GetList("sprites/hud.txt", &m_iSpriteCountAllRes);
+				break;
+		}
 
 		if (m_pSpriteList)
 		{
