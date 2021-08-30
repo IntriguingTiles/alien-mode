@@ -177,6 +177,7 @@
     <ClCompile Include="..\dlls\plane.cpp" />
     <ClCompile Include="..\dlls\plats.cpp" />
     <ClCompile Include="..\dlls\player.cpp" />
+    <ClCompile Include="..\dlls\ps2_healthcharger.cpp" />
     <ClCompile Include="..\dlls\python.cpp" />
     <ClCompile Include="..\dlls\rat.cpp" />
     <ClCompile Include="..\dlls\roach.cpp" />

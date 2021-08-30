@@ -369,6 +369,9 @@
     <ClCompile Include="..\dlls\weapon_islave.cpp">
       <Filter>Source Files\alien</Filter>
     </ClCompile>
+    <ClCompile Include="..\dlls\ps2_healthcharger.cpp">
+      <Filter>Source Files\alien</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\dlls\doors.h">
