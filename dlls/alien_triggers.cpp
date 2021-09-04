@@ -16,7 +16,7 @@ public:
 	void EXPORT FreezeThink( void );
 	void Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
 
-	int ObjectCaps( void ) { return CBaseDelay::ObjectCaps() & ~FCAP_ACROSS_TRANSITION; }
+	int ObjectCaps( void ) { return CBaseDelay::ObjectCaps(); }
 	virtual int		Save( CSave &save );
 	virtual int		Restore( CRestore &restore );
 
@@ -91,13 +91,12 @@ void CTriggerPlayerFreeze::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, U
 	}
 }
 
-// this entity is another gearbox moment
-// there's just so much weird stuff here
 class CTriggerPlayerISlave : public CBaseEntity
 {
 	void Spawn( void );
 	void EXPORT TriggerUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
 	void EXPORT TriggerThink( void );
+	int ObjectCaps( void ) { return CBaseEntity::ObjectCaps(); }
 };
 
 LINK_ENTITY_TO_CLASS( trigger_player_islave, CTriggerPlayerISlave );

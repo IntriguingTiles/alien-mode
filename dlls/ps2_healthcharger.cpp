@@ -15,7 +15,7 @@ public:
 	EXPORT void LiquidThink( void );
 	void SetLiquid( int liquid );
 	void SetSloshing( BOOL sloshing );
-	int ObjectCaps( void ) { return CBaseAnimating::ObjectCaps() & ~FCAP_ACROSS_TRANSITION; }
+	int ObjectCaps( void ) { return CBaseAnimating::ObjectCaps(); }
 	int Save( CSave &save );
 	int Restore( CRestore &restore );
 
@@ -136,7 +136,7 @@ public:
 	void DetermineYaw( void );
 	float VecToYaw( Vector vecDir );
 	void Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
-	int ObjectCaps() { return ( CBaseToggle::ObjectCaps() | FCAP_CONTINUOUS_USE ) & ~FCAP_ACROSS_TRANSITION; }
+	int ObjectCaps() { return ( CBaseToggle::ObjectCaps() | FCAP_CONTINUOUS_USE ); }
 	int Save( CSave &save );
 	int Restore( CRestore &restore );
 
