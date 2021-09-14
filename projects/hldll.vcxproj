@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -177,6 +177,7 @@
     <ClCompile Include="..\dlls\plane.cpp" />
     <ClCompile Include="..\dlls\plats.cpp" />
     <ClCompile Include="..\dlls\player.cpp" />
+    <ClCompile Include="..\dlls\ps2_eyescanner.cpp" />
     <ClCompile Include="..\dlls\ps2_healthcharger.cpp" />
     <ClCompile Include="..\dlls\python.cpp" />
     <ClCompile Include="..\dlls\rat.cpp" />
