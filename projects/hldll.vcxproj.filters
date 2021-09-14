@@ -375,6 +375,9 @@
     <ClCompile Include="..\dlls\ps2_eyescanner.cpp">
       <Filter>Source Files\alien</Filter>
     </ClCompile>
+    <ClCompile Include="..\dlls\item_generic.cpp">
+      <Filter>Source Files\alien</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\dlls\doors.h">
