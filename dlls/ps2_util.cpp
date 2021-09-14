@@ -2,7 +2,7 @@
 #include "util.h"
 #include "cbase.h"
 #include "player.h"
-#include "alien_util.h"
+#include "ps2_util.h"
 
 // misc util functions added by HLPS2
 

@@ -21,7 +21,7 @@
 #include "nodes.h"
 #include "player.h"
 #include "gamerules.h"
-#include "alien_util.h"
+#include "ps2_util.h"
 #include "UserMessages.h"
 
 #define CROWBAR_BODYHIT_VOLUME 128

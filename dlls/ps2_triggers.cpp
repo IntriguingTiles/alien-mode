@@ -3,7 +3,7 @@
 #include "cbase.h"
 #include "player.h"
 #include "saverestore.h"
-#include "alien_util.h"
+#include "ps2_util.h"
 
 // HLPS2 has several new triggers that need to be implemented:
 // trigger_playerfreeze  - toggles the FL_FROZEN flag on all players

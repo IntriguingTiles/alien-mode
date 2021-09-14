@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -111,7 +111,7 @@
     <ClCompile Include="..\dlls\agrunt.cpp" />
     <ClCompile Include="..\dlls\airtank.cpp" />
     <ClCompile Include="..\dlls\ps2_triggers.cpp" />
-    <ClCompile Include="..\dlls\alien_util.cpp" />
+    <ClCompile Include="..\dlls\ps2_util.cpp" />
     <ClCompile Include="..\dlls\animating.cpp" />
     <ClCompile Include="..\dlls\animation.cpp" />
     <ClCompile Include="..\dlls\apache.cpp" />
@@ -254,7 +254,7 @@
     <ClInclude Include="..\common\winsani_out.h" />
     <ClInclude Include="..\dlls\activity.h" />
     <ClInclude Include="..\dlls\activitymap.h" />
-    <ClInclude Include="..\dlls\alien_util.h" />
+    <ClInclude Include="..\dlls\ps2_util.h" />
     <ClInclude Include="..\dlls\animation.h" />
     <ClInclude Include="..\dlls\basemonster.h" />
     <ClInclude Include="..\dlls\cbase.h" />
