@@ -112,14 +112,14 @@ void CWallHealthNewCanister::SetSloshing( BOOL sloshing )
 
 CWallHealthNewCanister *SpawnHealthCanister( Vector *vecOrigin, Vector *vecAngles )
 {
-	CWallHealthNewCanister *canister = GetClassPtr( (CWallHealthNewCanister *)NULL );
+	CWallHealthNewCanister *pCanister = GetClassPtr( (CWallHealthNewCanister *)NULL );
 	
-	canister->pev->classname = MAKE_STRING( "item_healthchargercan" );
-	canister->pev->origin = *vecOrigin;
-	canister->pev->angles = *vecAngles;
-	canister->Spawn();
+	pCanister->pev->classname = MAKE_STRING( "item_healthchargercan" );
+	pCanister->pev->origin = *vecOrigin;
+	pCanister->pev->angles = *vecAngles;
+	pCanister->Spawn();
 	
-	return canister;
+	return pCanister;
 }
 
 class CWallHealthNew : public CBaseToggle
@@ -437,16 +437,11 @@ void CWallHealthNew::Recharge()
 
 void CWallHealthNew::Off()
 {
-	if ( m_iOn < 2 )
-	{
-		m_iOn = 0;
-	}
-	else
-	{
+	if ( m_iOn >= 2 ) {
 		STOP_SOUND( ENT( pev ), CHAN_STATIC, "items/medcharge4.wav" );
-		m_iOn = 0;
 	}
 
+	m_iOn = 0;
 	pev->sequence = LookupSequence( "retract_shot" );
 	pev->frame = 0.0;
 	ResetSequenceInfo();
@@ -460,12 +455,9 @@ void CWallHealthNew::Off()
 		{
 			m_flNextReactivate = gpGlobals->time + m_flReactivate;
 		}
-		m_flOffTime = 0.0;
 	}
-	else
-	{
-		m_flOffTime = 0.0;
-	}
+
+	m_flOffTime = 0.0;
 }
 
 BOOL CWallHealthNew::FindPlayer()
@@ -485,10 +477,13 @@ BOOL CWallHealthNew::FindPlayer()
 						if ( FVisible( pPlayer->pev->origin ) )
 						{
 							m_hPlayer = pPlayer;
+							return TRUE;
 						}
 					}
-
-					return TRUE;
+					else
+					{
+						return TRUE;
+					}
 				}
 			}
 		}
@@ -551,27 +546,13 @@ void CWallHealthNew::DetermineYaw()
 		{
 			if ( pev->angles.y > 225.0 || pev->angles.y <= 135.0 )
 			{
-				if ( pev->angles.y > 315.0 || pev->angles.y <= 225.0 )
-				{
-					// according to ghidra, if this block is entered, it skips to VecToYaw
-					// but that doesn't make sense since it didn't set any values for vec
-					// so i think this might be a gearbox moment but i'm not 100% sure
-					// it could be a clever optimization thing the compiler did
-					// i'm just going to do this
-					vec.x = pev->origin.x + 8.0;
-					vec.y = pev->origin.y + 4.0;
-				}
-				else
-				{
-					vec.x = pev->origin.x + -8.0;
-					vec.y = pev->origin.y + 4.0;
-				}
+				vec.x = pev->origin.x + -8.0;
+				vec.y = pev->origin.y + 4.0;
 			}
 			else
 			{
 				vec.x = pev->origin.x + -4.0;
 				vec.y = pev->origin.y + 8.0;
-				
 			}
 		}
 		else
