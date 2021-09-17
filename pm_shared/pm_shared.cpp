@@ -2568,6 +2568,8 @@ void PM_Jump ()
 			( pmove->flDuckTime > 0 ) &&
 			Length( pmove->velocity ) > 50 )
 		{
+			pmove->PM_PlaySound( CHAN_ITEM, "player/pl_long_jump.wav", 1.0, ATTN_NORM, 0, PITCH_NORM );
+
 			pmove->punchangle[0] = -5;
 
 			for (i =0; i < 2; i++)

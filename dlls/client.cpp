@@ -905,6 +905,7 @@ void ClientPrecache()
 	PRECACHE_SOUND("common/wpn_select.wav");
 	PRECACHE_SOUND("common/wpn_denyselect.wav");
 
+	PRECACHE_SOUND("player/pl_long_jump.wav");
 
 	// geiger sounds
 
