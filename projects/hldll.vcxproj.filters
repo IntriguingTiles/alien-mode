@@ -381,6 +381,9 @@
     <ClCompile Include="..\dlls\ps2_suitcharger.cpp">
       <Filter>Source Files\alien</Filter>
     </ClCompile>
+    <ClCompile Include="..\dlls\env_warpball.cpp">
+      <Filter>Source Files\alien</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\dlls\doors.h">

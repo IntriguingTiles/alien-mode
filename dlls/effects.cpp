@@ -368,50 +368,6 @@ void CBeam::DoSparks( const Vector &start, const Vector &end )
 }
 
 
-class CLightning : public CBeam
-{
-public:
-	void	Spawn() override;
-	void	Precache() override;
-	void	KeyValue( KeyValueData *pkvd ) override;
-	void	Activate() override;
-
-	void	EXPORT StrikeThink();
-	void	EXPORT DamageThink();
-	void	RandomArea();
-	void	RandomPoint( Vector &vecSrc );
-	void	Zap( const Vector &vecSrc, const Vector &vecDest );
-	void	EXPORT StrikeUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
-	void	EXPORT ToggleUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
-	
-	inline BOOL ServerSide()
-	{
-		if ( m_life == 0 && !(pev->spawnflags & SF_BEAM_RING) )
-			return TRUE;
-		return FALSE;
-	}
-
-	int		Save( CSave &save ) override;
-	int		Restore( CRestore &restore ) override;
-	static	TYPEDESCRIPTION m_SaveData[];
-
-	void	BeamUpdateVars();
-
-	int		m_active;
-	int		m_iszStartEntity;
-	int		m_iszEndEntity;
-	float	m_life;
-	int		m_boltWidth;
-	int		m_noiseAmplitude;
-	int		m_brightness;
-	int		m_speed;
-	float	m_restrike;
-	int		m_spriteTexture;
-	int		m_iszSpriteName;
-	int		m_frameStart;
-
-	float	m_radius;
-};
 
 LINK_ENTITY_TO_CLASS( env_lightning, CLightning );
 LINK_ENTITY_TO_CLASS( env_beam, CLightning );
@@ -943,6 +899,17 @@ void CLightning::BeamUpdateVars()
 		SetFlags( BEAM_FSHADEIN );
 	else if ( pev->spawnflags & SF_BEAM_SHADEOUT )
 		SetFlags( BEAM_FSHADEOUT );
+}
+
+CLightning *CLightning::LightningCreate( const char *pSpriteName, int width )
+{
+	// Create a new entity with CLightning private data
+	CLightning *pLightning = GetClassPtr( (CLightning *)NULL );
+	pLightning->pev->classname = MAKE_STRING( "env_beam" );
+
+	pLightning->BeamInit( pSpriteName, width );
+
+	return pLightning;
 }
 
 

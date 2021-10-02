@@ -110,6 +110,7 @@
     <ClCompile Include="..\dlls\aflock.cpp" />
     <ClCompile Include="..\dlls\agrunt.cpp" />
     <ClCompile Include="..\dlls\airtank.cpp" />
+    <ClCompile Include="..\dlls\env_warpball.cpp" />
     <ClCompile Include="..\dlls\ps2_suitcharger.cpp" />
     <ClCompile Include="..\dlls\ps2_triggers.cpp" />
     <ClCompile Include="..\dlls\ps2_util.cpp" />
