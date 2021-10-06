@@ -647,5 +647,8 @@
     <ClInclude Include="..\dlls\ps2_util.h">
       <Filter>Source Files\alien</Filter>
     </ClInclude>
+    <ClInclude Include="..\dlls\triggers.h">
+      <Filter>Source Files\dlls</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -290,6 +290,7 @@
     <ClInclude Include="..\dlls\talkmonster.h" />
     <ClInclude Include="..\dlls\teamplay_gamerules.h" />
     <ClInclude Include="..\dlls\trains.h" />
+    <ClInclude Include="..\dlls\triggers.h" />
     <ClInclude Include="..\dlls\UserMessages.h" />
     <ClInclude Include="..\dlls\util.h" />
     <ClInclude Include="..\dlls\vector.h" />

@@ -27,6 +27,7 @@
 #include "saverestore.h"
 #include "trains.h"			// trigger_camera has train functionality
 #include "gamerules.h"
+#include "triggers.h"
 
 #define	SF_TRIGGER_PUSH_START_OFF	2//spawnflag that makes trigger_push spawn turned OFF
 #define SF_TRIGGER_HURT_TARGETONCE	1// Only fire hurt target once
@@ -257,47 +258,6 @@ void CTriggerRelay::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE
 // FLAG:		THREAD (create clones when triggered)
 // FLAG:		CLONE (this is a clone for a threaded execution)
 
-#define SF_MULTIMAN_CLONE		0x80000000
-#define SF_MULTIMAN_THREAD		0x00000001
-
-class CMultiManager : public CBaseToggle
-{
-public:
-	void KeyValue( KeyValueData *pkvd ) override;
-	void Spawn () override;
-	void EXPORT ManagerThink ();
-	void EXPORT ManagerUse   ( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
-
-#if _DEBUG
-	void EXPORT ManagerReport();
-#endif
-
-	BOOL		HasTarget( string_t targetname ) override;
-	
-	int ObjectCaps() override { return CBaseToggle::ObjectCaps() & ~FCAP_ACROSS_TRANSITION; }
-
-	int		Save( CSave &save ) override;
-	int		Restore( CRestore &restore ) override;
-
-	static	TYPEDESCRIPTION m_SaveData[];
-
-	int		m_cTargets;	// the total number of targets in this manager's fire list.
-	int		m_index;	// Current target
-	float	m_startTime;// Time we started firing
-	int		m_iTargetName	[ MAX_MULTI_TARGETS ];// list if indexes into global string array
-	float	m_flTargetDelay [ MAX_MULTI_TARGETS ];// delay (in seconds) from time of manager fire to target fire
-private:
-	inline BOOL IsClone() { return (pev->spawnflags & SF_MULTIMAN_CLONE) ? TRUE : FALSE; }
-	inline BOOL ShouldClone() 
-	{ 
-		if ( IsClone() )
-			return FALSE;
-
-		return (pev->spawnflags & SF_MULTIMAN_THREAD) ? TRUE : FALSE; 
-	}
-
-	CMultiManager *Clone();
-};
 LINK_ENTITY_TO_CLASS( multi_manager, CMultiManager );
 
 // Global Savedata for multi_manager
@@ -345,7 +305,7 @@ void CMultiManager :: Spawn()
 {
 	pev->solid = SOLID_NOT;
 	SetUse ( &CMultiManager::ManagerUse );
-	SetThink ( &CMultiManager::ManagerThink);
+	SetThink ( &CMultiManager::CallManagerThink);
 
 	// Sort targets
 	// Quick and dirty bubble sort
@@ -444,7 +404,7 @@ void CMultiManager :: ManagerUse ( CBaseEntity *pActivator, CBaseEntity *pCaller
 
 	SetUse( NULL );// disable use until all targets have fired
 
-	SetThink ( &CMultiManager::ManagerThink );
+	SetThink ( &CMultiManager::CallManagerThink );
 	pev->nextthink = gpGlobals->time;
 }
 

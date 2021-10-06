@@ -4,11 +4,13 @@
 #include "player.h"
 #include "saverestore.h"
 #include "ps2_util.h"
+#include "triggers.h"
 
 // HLPS2 has several new triggers that need to be implemented:
 // trigger_playerfreeze  - toggles the FL_FROZEN flag on all players
 // trigger_player_islave - fires the target if alien mode is active
 // trigger_random        - stupid trigger used in a SINGLE map for a silly easter egg
+// multi_kill_manager	 - like multi_manager but killing instead of firing
 
 class CTriggerPlayerFreeze : public CBaseDelay
 {
@@ -312,5 +314,66 @@ void CTriggerRandom::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYP
 	if ( pev->spawnflags & 1 )
 	{
 		UTIL_Remove( this );
+	}
+}
+
+class CMultiKillManager : public CMultiManager
+{
+	void ManagerThink( void );
+	CMultiManager *Clone(void);
+	void CMultiKillManager::KillTargets( const char *targetName );
+};
+
+LINK_ENTITY_TO_CLASS( multi_kill_manager, CMultiKillManager );
+
+void CMultiKillManager::ManagerThink()
+{
+	float time;
+
+	time = gpGlobals->time - m_startTime;
+	while ( m_index < m_cTargets && m_flTargetDelay[m_index] <= time )
+	{
+		KillTargets( STRING( m_iTargetName[m_index] ) );
+		m_index++;
+	}
+
+	if ( m_index >= m_cTargets ) // have we fired all targets?
+	{
+		SetThink( NULL );
+		if ( IsClone() )
+		{
+			UTIL_Remove( this );
+			return;
+		}
+		SetUse( &CMultiManager::ManagerUse ); // allow manager re-use
+	}
+	else
+		pev->nextthink = m_startTime + m_flTargetDelay[m_index];
+}
+
+CMultiManager *CMultiKillManager::Clone()
+{
+	CMultiManager *pMulti = GetClassPtr( (CMultiKillManager *)NULL );
+
+	edict_t *pEdict = pMulti->pev->pContainingEntity;
+	memcpy( pMulti->pev, pev, sizeof( *pev ) );
+	pMulti->pev->pContainingEntity = pEdict;
+
+	pMulti->pev->spawnflags |= SF_MULTIMAN_CLONE;
+	pMulti->m_cTargets = m_cTargets;
+	memcpy( pMulti->m_iTargetName, m_iTargetName, sizeof( m_iTargetName ) );
+	memcpy( pMulti->m_flTargetDelay, m_flTargetDelay, sizeof( m_flTargetDelay ) );
+
+	return pMulti;
+}
+
+void CMultiKillManager::KillTargets( const char *targetName )
+{
+	CBaseEntity *pTarget = UTIL_FindEntityByString( NULL, "targetname", targetName );
+
+	while ( pTarget )
+	{
+		UTIL_Remove( pTarget );
+		pTarget = UTIL_FindEntityByString( pTarget, "targetname", targetName );		
 	}
 }
