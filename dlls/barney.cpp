@@ -27,6 +27,7 @@
 #include	"scripted.h"
 #include	"weapons.h"
 #include	"soundent.h"
+#include	"studio.h"
 
 //=========================================================
 // Monster's Anim Events Go Here
@@ -72,6 +73,8 @@ public:
 
 	void TraceAttack( entvars_t *pevAttacker, float flDamage, Vector vecDir, TraceResult *ptr, int bitsDamageType) override;
 	void Killed( entvars_t *pevAttacker, int iGib ) override;
+
+	BOOL IsUsingPS2Model( void );
 	
 	int		Save( CSave &save ) override;
 	int		Restore( CRestore &restore ) override;
@@ -385,13 +388,21 @@ void CBarney :: HandleAnimEvent( MonsterEvent_t *pEvent )
 
 	case BARNEY_AE_DRAW:
 		// barney's bodygroup switches here so he can pull gun from holster
-		pev->body = BARNEY_BODY_GUNDRAWN;
+		if ( IsUsingPS2Model() )
+			SetBodygroup( 1, 3 );
+		else
+			pev->body = BARNEY_BODY_GUNDRAWN;
+
 		m_fGunDrawn = TRUE;
 		break;
 
 	case BARNEY_AE_HOLSTER:
 		// change bodygroup to replace gun in holster
-		pev->body = BARNEY_BODY_GUNHOLSTERED;
+		if ( IsUsingPS2Model() )
+			SetBodygroup( 1, 0 );
+		else
+			pev->body = BARNEY_BODY_GUNHOLSTERED;
+
 		m_fGunDrawn = FALSE;
 		break;
 
@@ -611,16 +622,33 @@ void CBarney::TraceAttack( entvars_t *pevAttacker, float flDamage, Vector vecDir
 
 void CBarney::Killed( entvars_t *pevAttacker, int iGib )
 {
-	if ( pev->body < BARNEY_BODY_GUNGONE )
-	{// drop the gun!
-		Vector vecGunPos;
-		Vector vecGunAngles;
+	if ( IsUsingPS2Model() )
+	{
+		if ( GetBodygroup( 1 ) < 6 )
+		{
+			Vector vecGunPos;
+			Vector vecGunAngles;
 
-		pev->body = BARNEY_BODY_GUNGONE;
+			SetBodygroup( 1, 6 );
 
-		GetAttachment( 0, vecGunPos, vecGunAngles );
-		
-		CBaseEntity *pGun = DropItem( "weapon_9mmhandgun", vecGunPos, vecGunAngles );
+			GetAttachment( 0, vecGunPos, vecGunAngles );
+
+			CBaseEntity *pGun = DropItem( "weapon_9mmhandgun", vecGunPos, vecGunAngles );
+		}
+	}
+	else
+	{
+		if ( pev->body < BARNEY_BODY_GUNGONE )
+		{// drop the gun!
+			Vector vecGunPos;
+			Vector vecGunAngles;
+
+			pev->body = BARNEY_BODY_GUNGONE;
+
+			GetAttachment( 0, vecGunPos, vecGunAngles );
+			
+			CBaseEntity *pGun = DropItem( "weapon_9mmhandgun", vecGunPos, vecGunAngles );
+		}
 	}
 
 	SetUse( NULL );	
@@ -773,6 +801,21 @@ void CBarney::DeclineFollowing()
 	PlaySentence( "BA_POK", 2, VOL_NORM, ATTN_NORM );
 }
 
+BOOL CBarney::IsUsingPS2Model()
+{
+	studiohdr_t *pstudiohdr = (studiohdr_t *)GET_MODEL_PTR( ENT( pev ) );
+
+	if ( !pstudiohdr )
+	{
+		ALERT( at_console, "Couldn't get studiohdr for barney!\n" );
+		return FALSE;
+	}
+
+	if ( pstudiohdr->bodypartindex == 178796 )
+		return TRUE;
+	else
+		return FALSE;
+}
 
 
 
