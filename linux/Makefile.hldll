@@ -133,9 +133,12 @@ HLDLL_OBJS = \
 	$(HLDLL_OBJ_DIR)/world.o \
 	$(HLDLL_OBJ_DIR)/xen.o \
 	$(HLDLL_OBJ_DIR)/zombie.o \
-	$(HLDLL_OBJ_DIR)/alien_triggers.o \
-	$(HLDLL_OBJ_DIR)/alien_util.o \
-	$(HLDLL_OBJ_DIR)/weapon_islave.o
+	$(HLDLL_OBJ_DIR)/ps2_triggers.o \
+	$(HLDLL_OBJ_DIR)/ps2_util.o \
+	$(HLDLL_OBJ_DIR)/ps2_eyescanner.o \
+	$(HLDLL_OBJ_DIR)/ps2_healthcharger.o \
+	$(HLDLL_OBJ_DIR)/ps2_suitcharger.o \
+	$(HLDLL_OBJ_DIR)/weapon_islave.o \
 
 HLWPN_OBJS = \
 	$(HLWPN_OBJ_DIR)/hl_wpn_glock.o
