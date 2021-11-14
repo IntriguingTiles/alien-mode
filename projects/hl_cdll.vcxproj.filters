@@ -312,7 +312,7 @@
     <ClCompile Include="..\dlls\weapon_islave.cpp">
       <Filter>Source Files\alien</Filter>
     </ClCompile>
-    <ClCompile Include="hud_islave.cpp">
+    <ClCompile Include="..\cl_dll\hud_islave.cpp">
       <Filter>Source Files\alien</Filter>
     </ClCompile>
   </ItemGroup>
