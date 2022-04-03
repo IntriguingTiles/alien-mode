@@ -30,9 +30,10 @@
 LINK_ENTITY_TO_CLASS( weapon_islave, CWeaponISlave );
 
 #ifndef CLIENT_DLL
-	#define SEND_HUD_MSG() MESSAGE_BEGIN( MSG_ONE, gmsgISlaveHud, NULL, m_pPlayer->pev ); \
-				WRITE_BYTE( m_iHudState ); \
-			MESSAGE_END();
+	#define SEND_HUD_MSG()                                                                                             \
+		MESSAGE_BEGIN( MSG_ONE, gmsgISlaveHud, NULL, m_pPlayer->pev );                                                 \
+		WRITE_BYTE( m_iHudState );                                                                                     \
+		MESSAGE_END();
 #else
 	#define SEND_HUD_MSG()
 #endif
@@ -134,7 +135,8 @@ BOOL CWeaponISlave::Deploy()
 
 void CWeaponISlave::Holster( int skiplocal /* = 0 */ )
 {
-	m_pPlayer->m_iHideHUD &= ~( HIDEHUD_HEALTH | HIDEHUD_FLASHLIGHT | HIDEHUD_WEAPONS );
+	if ( m_pPlayer->pev->weapons & ( 1 << WEAPON_CROWBAR ) )
+		m_pPlayer->m_iHideHUD &= ~( HIDEHUD_HEALTH | HIDEHUD_FLASHLIGHT | HIDEHUD_WEAPONS );
 	m_pPlayer->m_flNextAttack = UTIL_WeaponTimeBase() + 0.5;
 	ClearBeams();
 	m_flZapTime = 0.0;
@@ -317,8 +319,8 @@ void CWeaponISlave::PrimaryAttack()
 	if ( 2 < m_iSwing )
 		m_iSwing = 0;
 
-	// gearbox moment: this overwrites the previously set primary attack delays
-	// although this might be intentional
+		// gearbox moment: this overwrites the previously set primary attack delays
+		// although this might be intentional
 #ifndef CLIENT_DLL
 	if ( CVAR_GET_FLOAT( "sv_alien_alt_melee" ) == 0 )
 #endif
