@@ -8,7 +8,7 @@
 
 void UTIL_FreezePlayer( CBaseEntity* pPlayer, BOOL bUnFreeze )
 {
-	if ( bUnFreeze ) pPlayer->pev->flags &= !FL_FROZEN;
+	if ( bUnFreeze ) pPlayer->pev->flags &= ~FL_FROZEN;
 	else pPlayer->pev->flags |= FL_FROZEN;
 }
 
