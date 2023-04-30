@@ -196,6 +196,7 @@
     <ClCompile Include="doors.cpp" />
     <ClCompile Include="effects.cpp" />
     <ClCompile Include="egon.cpp" />
+    <ClCompile Include="env_warpball.cpp" />
     <ClCompile Include="explode.cpp" />
     <ClCompile Include="flyingmonster.cpp" />
     <ClCompile Include="func_break.cpp" />
@@ -224,6 +225,7 @@
     <ClCompile Include="ichthyosaur.cpp" />
     <ClCompile Include="islave.cpp" />
     <ClCompile Include="items.cpp" />
+    <ClCompile Include="item_generic.cpp" />
     <ClCompile Include="leech.cpp" />
     <ClCompile Include="lights.cpp" />
     <ClCompile Include="maprules.cpp" />
@@ -240,6 +242,11 @@
     <ClCompile Include="plane.cpp" />
     <ClCompile Include="plats.cpp" />
     <ClCompile Include="player.cpp" />
+    <ClCompile Include="ps2_eyescanner.cpp" />
+    <ClCompile Include="ps2_healthcharger.cpp" />
+    <ClCompile Include="ps2_suitcharger.cpp" />
+    <ClCompile Include="ps2_triggers.cpp" />
+    <ClCompile Include="ps2_util.cpp" />
     <ClCompile Include="python.cpp" />
     <ClCompile Include="rat.cpp" />
     <ClCompile Include="roach.cpp" />
@@ -266,6 +273,7 @@
     <ClCompile Include="turret.cpp" />
     <ClCompile Include="util.cpp" />
     <ClCompile Include="weapons.cpp" />
+    <ClCompile Include="weapon_islave.cpp" />
     <ClCompile Include="world.cpp" />
     <ClCompile Include="wpn_shared\hl_wpn_glock.cpp" />
     <ClCompile Include="xen.cpp" />
@@ -303,6 +311,7 @@
     <ClInclude Include="nodes.h" />
     <ClInclude Include="plane.h" />
     <ClInclude Include="player.h" />
+    <ClInclude Include="ps2_util.h" />
     <ClInclude Include="saverestore.h" />
     <ClInclude Include="schedule.h" />
     <ClInclude Include="scripted.h" />
@@ -314,6 +323,7 @@
     <ClInclude Include="talkmonster.h" />
     <ClInclude Include="teamplay_gamerules.h" />
     <ClInclude Include="trains.h" />
+    <ClInclude Include="triggers.h" />
     <ClInclude Include="util.h" />
     <ClInclude Include="vector.h" />
     <ClInclude Include="weapons.h" />

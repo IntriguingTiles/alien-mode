@@ -114,6 +114,22 @@ dynpitchvol_t rgdpvpreset[CDPVPRESETMAX] =
 {27,128,	 90,	10,		10,		10,		1,		20,		40,		1,		5,		10,		20,		0,		0,0,0,0,0,0,0,0,0,0}
 };
 
+const char* gibberish[12] =
+{
+	"scientist/gibberish01.wav",
+	"scientist/gibberish02.wav",
+	"scientist/gibberish03.wav",
+	"scientist/gibberish04.wav",
+	"scientist/gibberish05.wav",
+	"scientist/gibberish06.wav",
+	"scientist/gibberish07.wav",
+	"scientist/gibberish08.wav",
+	"scientist/gibberish09.wav",
+	"scientist/gibberish10.wav",
+	"scientist/gibberish11.wav",
+	"scientist/gibberish12.wav",
+};
+
 class CAmbientGeneric : public CBaseEntity
 {
 public:
@@ -1405,19 +1421,45 @@ int SENTENCEG_Lookup(const char *sample, char *sentencenum)
 	return -1;
 }
 
+BOOL AlienModeSounds(edict_t *entity, int channel, const char *sample, float volume, float attenuation,
+						   int flags, int pitch)
+{
+	if ( sample )
+	{
+		CBaseEntity *pPlayer = CBaseEntity::Instance( g_engfuncs.pfnPEntityOfEntIndex( 1 ) );
+
+		if ( pPlayer && pPlayer->IsPlayer() )
+		{
+			if ( strstr( sample, "scientist" ) || strstr( sample, "!SC" ) || strstr( sample, "barney" ) || strstr( sample, "!BA" ) )
+			{
+				if ( strstr( sample, "pain" ) || strstr( sample, "scream" ))
+					return FALSE;
+
+				EMIT_SOUND_DYN2( entity, channel, gibberish[ RANDOM_LONG( 0, CVAR_GET_FLOAT( "sv_alien_gibberish" ) == 0 ? 2 : 11 ) ], volume, attenuation, flags, pitch );
+				return TRUE;
+			}
+		}
+	}
+
+	return FALSE;
+}
+
 void EMIT_SOUND_DYN(edict_t *entity, int channel, const char *sample, float volume, float attenuation,
 						   int flags, int pitch)
 {
-	if (sample && *sample == '!')
+	if ( !AlienModeSounds( entity, channel, sample, volume, attenuation, flags, pitch ) )
 	{
-		char name[32];
-		if (SENTENCEG_Lookup(sample, name) >= 0)
-				EMIT_SOUND_DYN2(entity, channel, name, volume, attenuation, flags, pitch);
+		if (sample && *sample == '!')
+		{
+			char name[32];
+			if (SENTENCEG_Lookup(sample, name) >= 0)
+					EMIT_SOUND_DYN2(entity, channel, name, volume, attenuation, flags, pitch);
+			else
+				ALERT( at_aiconsole, "Unable to find %s in sentences.txt\n", sample );
+		}
 		else
-			ALERT( at_aiconsole, "Unable to find %s in sentences.txt\n", sample );
+			EMIT_SOUND_DYN2(entity, channel, sample, volume, attenuation, flags, pitch);
 	}
-	else
-		EMIT_SOUND_DYN2(entity, channel, sample, volume, attenuation, flags, pitch);
 }
 
 // play a specific sentence over the HEV suit speaker - just pass player entity, and !sentencename

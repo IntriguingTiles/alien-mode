@@ -82,6 +82,10 @@ extern client_sprite_t *GetSpriteList(client_sprite_t *pList, const char *psz, i
 
 extern cvar_t *sensitivity;
 cvar_t *cl_lw = NULL;
+cvar_t *cl_rollangle = NULL;
+cvar_t *cl_rollspeed = NULL;
+cvar_t *cl_bobtilt = NULL;
+cvar_t *cl_alien_hud_scale = NULL;
 
 void ShutdownInput (void);
 
@@ -313,6 +317,10 @@ void CHud :: Init( void )
 	m_pCvarStealMouse = CVAR_CREATE( "hud_capturemouse", "1", FCVAR_ARCHIVE );
 	m_pCvarDraw = CVAR_CREATE( "hud_draw", "1", FCVAR_ARCHIVE );
 	cl_lw = gEngfuncs.pfnGetCvarPointer( "cl_lw" );
+	cl_rollangle = CVAR_CREATE( "cl_rollangle", "2.0", FCVAR_ARCHIVE );
+	cl_rollspeed = CVAR_CREATE( "cl_rollspeed", "200", FCVAR_ARCHIVE );
+	cl_bobtilt = CVAR_CREATE( "cl_bobtilt", "0", FCVAR_ARCHIVE );
+	cl_alien_hud_scale = CVAR_CREATE( "cl_alien_hud_scale", "2", FCVAR_ARCHIVE );
 
 	m_pSpriteList = NULL;
 
@@ -346,6 +354,7 @@ void CHud :: Init( void )
 	m_AmmoSecondary.Init();
 	m_TextMessage.Init();
 	m_StatusIcons.Init();
+	m_ISlave.Init();
 	GetClientVoiceMgr()->Init(&g_VoiceStatusHelper, (vgui::Panel**)&gViewPort);
 
 	m_Menu.Init();
@@ -416,7 +425,18 @@ void CHud :: VidInit( void )
 	if ( !m_pSpriteList )
 	{
 		// we need to load the hud.txt, and all sprites within
-		m_pSpriteList = SPR_GetList("sprites/hud.txt", &m_iSpriteCountAllRes);
+		switch ( (int)( cl_alien_hud_scale->value ) )
+		{
+			case 1:
+				m_pSpriteList = SPR_GetList( "sprites/hud_2x.txt", &m_iSpriteCountAllRes );
+				break;
+			case 2:
+				m_pSpriteList = SPR_GetList( "sprites/hud_3x.txt", &m_iSpriteCountAllRes );
+				break;
+			default:
+				m_pSpriteList = SPR_GetList("sprites/hud.txt", &m_iSpriteCountAllRes);
+				break;
+		}
 
 		if (m_pSpriteList)
 		{
@@ -494,6 +514,7 @@ void CHud :: VidInit( void )
 	m_AmmoSecondary.VidInit();
 	m_TextMessage.VidInit();
 	m_StatusIcons.VidInit();
+	m_ISlave.VidInit();
 	GetClientVoiceMgr()->VidInit();
 }
 

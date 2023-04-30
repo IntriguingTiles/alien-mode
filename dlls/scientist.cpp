@@ -26,6 +26,7 @@
 #include	"scripted.h"
 #include	"animation.h"
 #include	"soundent.h"
+#include	"studio.h"
 
 
 #define		NUM_SCIENTIST_HEADS		4 // four heads available for scientist model
@@ -100,6 +101,9 @@ public:
 	void TalkInit( void );
 
 	void			Killed( entvars_t *pevAttacker, int iGib );
+
+	BOOL IsUsingPS2Model( void );
+	int GetHead( void );
 	
 	virtual int		Save( CSave &save );
 	virtual int		Restore( CRestore &restore );
@@ -634,16 +638,10 @@ void CScientist :: HandleAnimEvent( MonsterEvent_t *pEvent )
 		Heal();
 		break;
 	case SCIENTIST_AE_NEEDLEON:
-		{
-		int oldBody = pev->body;
-		pev->body = (oldBody % NUM_SCIENTIST_HEADS) + NUM_SCIENTIST_HEADS * 1;
-		}
+		SetBodygroup( 2, 1 );
 		break;
 	case SCIENTIST_AE_NEEDLEOFF:
-		{
-		int oldBody = pev->body;
-		pev->body = (oldBody % NUM_SCIENTIST_HEADS) + NUM_SCIENTIST_HEADS * 0;
-		}
+		SetBodygroup( 2, 0 );
 		break;
 
 	default:
@@ -677,12 +675,22 @@ void CScientist :: Spawn( void )
 	pev->skin = 0;
 
 	if ( pev->body == -1 )
-	{// -1 chooses a random head
-		pev->body = RANDOM_LONG(0, NUM_SCIENTIST_HEADS-1);// pick a head, any head
+	{ // -1 chooses a random head
+		pev->body = 0;
+		if ( IsUsingPS2Model() )
+			SetBodygroup( 1, RANDOM_LONG( 0, NUM_SCIENTIST_HEADS - 1 ) * 5 );
+		else
+			pev->body = RANDOM_LONG( 0, NUM_SCIENTIST_HEADS - 1 ); // pick a head, any head
+	}
+	else if ( IsUsingPS2Model() )
+	{
+		int oldBody = pev->body;
+		pev->body = 0;
+		SetBodygroup( 1, oldBody * 5 );
 	}
 
 	// Luther is black, make his hands black
-	if ( pev->body == HEAD_LUTHER )
+	if ( GetHead() == HEAD_LUTHER)
 		pev->skin = 1;
 	
 	MonsterInit();
@@ -1094,6 +1102,29 @@ int CScientist::FriendNumber( int arrayNumber )
 	return arrayNumber;
 }
 
+BOOL CScientist::IsUsingPS2Model()
+{
+	studiohdr_t *pstudiohdr = (studiohdr_t *)GET_MODEL_PTR( ENT( pev ) );
+
+	if ( !pstudiohdr )
+	{
+		ALERT( at_console, "Couldn't get studiohdr for scientist!\n" );
+		return FALSE;
+	}
+
+	if ( pstudiohdr->bodypartindex == 503736 )
+		return TRUE;
+	else
+		return FALSE;
+}
+
+int CScientist::GetHead()
+{
+	if ( IsUsingPS2Model() )
+		return GetBodygroup( 1 ) / 5;
+	else
+		return pev->body;
+}
 
 //=========================================================
 // Dead Scientist PROP
@@ -1103,6 +1134,9 @@ class CDeadScientist : public CBaseMonster
 public:
 	void Spawn( void );
 	int	Classify ( void ) { return	CLASS_HUMAN_PASSIVE; }
+
+	BOOL IsUsingPS2Model( void );
+	int GetHead( void );
 
 	void KeyValue( KeyValueData *pkvd );
 	int	m_iPose;// which sequence to display
@@ -1138,11 +1172,22 @@ void CDeadScientist :: Spawn( )
 	m_bloodColor = BLOOD_COLOR_RED;
 
 	if ( pev->body == -1 )
-	{// -1 chooses a random head
-		pev->body = RANDOM_LONG(0, NUM_SCIENTIST_HEADS-1);// pick a head, any head
+	{ // -1 chooses a random head
+		pev->body = 0;
+		if ( IsUsingPS2Model() )
+			SetBodygroup( 1, RANDOM_LONG( 0, NUM_SCIENTIST_HEADS - 1 ) * 5 );
+		else
+			pev->body = RANDOM_LONG( 0, NUM_SCIENTIST_HEADS - 1 ); // pick a head, any head
 	}
+	else if ( IsUsingPS2Model() )
+	{
+		int oldBody = pev->body;
+		pev->body = 0;
+		SetBodygroup( 1, oldBody * 5 );
+	}
+
 	// Luther is black, make his hands black
-	if ( pev->body == HEAD_LUTHER )
+	if ( GetHead() == HEAD_LUTHER )
 		pev->skin = 1;
 	else
 		pev->skin = 0;
@@ -1157,6 +1202,29 @@ void CDeadScientist :: Spawn( )
 	MonsterInitDead();
 }
 
+BOOL CDeadScientist::IsUsingPS2Model()
+{
+	studiohdr_t *pstudiohdr = (studiohdr_t *)GET_MODEL_PTR( ENT( pev ) );
+
+	if ( !pstudiohdr )
+	{
+		ALERT( at_console, "Couldn't get studiohdr for deadscientist!\n" );
+		return FALSE;
+	}
+
+	if ( pstudiohdr->bodypartindex == 503736 )
+		return TRUE;
+	else
+		return FALSE;
+}
+
+int CDeadScientist::GetHead()
+{
+	if ( IsUsingPS2Model() )
+		return GetBodygroup( 1 ) / 5;
+	else
+		return pev->body;
+}
 
 //=========================================================
 // Sitting Scientist PROP
@@ -1229,11 +1297,22 @@ void CSittingScientist :: Spawn( )
 	SetBits(pev->spawnflags, SF_MONSTER_PREDISASTER); // predisaster only!
 
 	if ( pev->body == -1 )
-	{// -1 chooses a random head
-		pev->body = RANDOM_LONG(0, NUM_SCIENTIST_HEADS-1);// pick a head, any head
+	{ // -1 chooses a random head
+		pev->body = 0;
+		if ( IsUsingPS2Model() )
+			SetBodygroup( 1, RANDOM_LONG( 0, NUM_SCIENTIST_HEADS - 1 ) * 5 );
+		else
+			pev->body = RANDOM_LONG( 0, NUM_SCIENTIST_HEADS - 1 ); // pick a head, any head
 	}
+	else if ( IsUsingPS2Model() )
+	{
+		int oldBody = pev->body;
+		pev->body = 0;
+		SetBodygroup( 1, oldBody * 5 );
+	}
+
 	// Luther is black, make his hands black
-	if ( pev->body == HEAD_LUTHER )
+	if ( GetHead() == HEAD_LUTHER )
 		pev->skin = 1;
 	
 	m_baseSequence = LookupSequence( "sitlookleft" );

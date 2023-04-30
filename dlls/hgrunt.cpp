@@ -41,6 +41,7 @@
 #include	"soundent.h"
 #include	"effects.h"
 #include	"customentity.h"
+#include	"studio.h"
 
 int g_fGruntQuestion;				// true if an idle grunt asked a question. Cleared when someone answers.
 
@@ -65,13 +66,13 @@ extern DLL_GLOBAL int		g_iSkillLevel;
 
 #define HEAD_GROUP					1
 #define HEAD_GRUNT					0
-#define HEAD_COMMANDER				1
-#define HEAD_SHOTGUN				2
-#define HEAD_M203					3
+#define HEAD_COMMANDER				(IsUsingPS2Model() ? 3 : 1)
+#define HEAD_SHOTGUN				(IsUsingPS2Model() ? 6 : 2)
+#define HEAD_M203					(IsUsingPS2Model() ? 9 : 3)
 #define GUN_GROUP					2
 #define GUN_MP5						0
-#define GUN_SHOTGUN					1
-#define GUN_NONE					2
+#define GUN_SHOTGUN					(IsUsingPS2Model() ? 3 : 1)
+#define GUN_NONE					(IsUsingPS2Model() ? 6 : 2)
 
 //=========================================================
 // Monster's Anim Events Go Here
@@ -160,6 +161,8 @@ public:
 
 	BOOL FOkToSpeak( void );
 	void JustSpoke( void );
+
+	BOOL IsUsingPS2Model( void );
 
 	CUSTOM_SCHEDULES;
 	static TYPEDESCRIPTION m_SaveData[];
@@ -279,7 +282,7 @@ void CHGrunt :: GibMonster ( void )
 	Vector	vecGunPos;
 	Vector	vecGunAngles;
 
-	if ( GetBodygroup( 2 ) != 2 )
+	if ( GetBodygroup( 2 ) != GUN_NONE )
 	{// throw a gun if the grunt has one
 		GetAttachment( 0, vecGunPos, vecGunAngles );
 		
@@ -2371,6 +2374,21 @@ Schedule_t* CHGrunt :: GetScheduleOfType ( int Type )
 	}
 }
 
+BOOL CHGrunt::IsUsingPS2Model()
+{
+	studiohdr_t *pstudiohdr = (studiohdr_t *)GET_MODEL_PTR( ENT( pev ) );
+
+	if ( !pstudiohdr )
+	{
+		ALERT( at_console, "Couldn't get studiohdr for hgrunt!\n" );
+		return FALSE;
+	}
+
+	if ( pstudiohdr->bodypartindex == 235568 )
+		return TRUE;
+	else
+		return FALSE;
+}
 
 //=========================================================
 // CHGruntRepel - when triggered, spawns a monster_human_grunt
@@ -2441,6 +2459,8 @@ public:
 	int	Classify ( void ) { return	CLASS_HUMAN_MILITARY; }
 
 	void KeyValue( KeyValueData *pkvd );
+
+	BOOL IsUsingPS2Model( void );
 
 	int	m_iPose;// which sequence to display	-- temporary, don't need to save
 	static char *m_szPoses[3];
@@ -2514,4 +2534,20 @@ void CDeadHGrunt :: Spawn( void )
 	}
 
 	MonsterInitDead();
+}
+
+BOOL CDeadHGrunt::IsUsingPS2Model()
+{
+	studiohdr_t *pstudiohdr = (studiohdr_t *)GET_MODEL_PTR( ENT( pev ) );
+
+	if ( !pstudiohdr )
+	{
+		ALERT( at_console, "Couldn't get studiohdr for deadhgrunt!\n" );
+		return FALSE;
+	}
+
+	if ( pstudiohdr->bodypartindex == 235568 )
+		return TRUE;
+	else
+		return FALSE;
 }

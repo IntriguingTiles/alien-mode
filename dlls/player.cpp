@@ -183,6 +183,7 @@ int gmsgSetFOV = 0;
 int gmsgShowMenu = 0;
 int gmsgGeigerRange = 0;
 int gmsgTeamNames = 0;
+int gmsgISlaveHud = 0;
 
 int gmsgStatusText = 0;
 int gmsgStatusValue = 0; 
@@ -230,6 +231,7 @@ void LinkUserMessages( void )
 	gmsgFade = REG_USER_MSG("ScreenFade", sizeof(ScreenFade));
 	gmsgAmmoX = REG_USER_MSG("AmmoX", 2);
 	gmsgTeamNames = REG_USER_MSG( "TeamNames", -1 );
+	gmsgISlaveHud = REG_USER_MSG( "ISlaveHud", 1 );
 
 	gmsgStatusText = REG_USER_MSG("StatusText", -1);
 	gmsgStatusValue = REG_USER_MSG("StatusValue", 3); 
@@ -1782,10 +1784,11 @@ void CBasePlayer::PreThink(void)
 	ItemPreFrame( );
 	WaterMove();
 
-	if ( g_pGameRules && g_pGameRules->FAllowFlashlight() )
+	// silly!
+	/*if ( g_pGameRules && g_pGameRules->FAllowFlashlight() )
 		m_iHideHUD &= ~HIDEHUD_FLASHLIGHT;
 	else
-		m_iHideHUD |= HIDEHUD_FLASHLIGHT;
+		m_iHideHUD |= HIDEHUD_FLASHLIGHT;*/
 
 
 	// JOHN: checks if new client data (for HUD and view control) needs to be sent to the client
@@ -2240,95 +2243,7 @@ void CBasePlayer::CheckSuitUpdate()
 
 void CBasePlayer::SetSuitUpdate(char *name, int fgroup, int iNoRepeatTime)
 {
-	int i;
-	int isentence;
-	int iempty = -1;
-	
-	
-	// Ignore suit updates if no suit
-	if ( !(pev->weapons & (1<<WEAPON_SUIT)) )
-		return;
-
-	if ( g_pGameRules->IsMultiplayer() )
-	{
-		// due to static channel design, etc. We don't play HEV sounds in multiplayer right now.
-		return;
-	}
-
-	// if name == NULL, then clear out the queue
-
-	if (!name)
-	{
-		for (i = 0; i < CSUITPLAYLIST; i++)
-			m_rgSuitPlayList[i] = 0;
-		return;
-	}
-	// get sentence or group number
-	if (!fgroup)
-	{
-		isentence = SENTENCEG_Lookup(name, NULL);
-		if (isentence < 0)
-			return;
-	}
-	else
-		// mark group number as negative
-		isentence = -SENTENCEG_GetIndex(name);
-
-	// check norepeat list - this list lets us cancel
-	// the playback of words or sentences that have already
-	// been played within a certain time.
-
-	for (i = 0; i < CSUITNOREPEAT; i++)
-	{
-		if (isentence == m_rgiSuitNoRepeat[i])
-			{
-			// this sentence or group is already in 
-			// the norepeat list
-
-			if (m_rgflSuitNoRepeatTime[i] < gpGlobals->time)
-				{
-				// norepeat time has expired, clear it out
-				m_rgiSuitNoRepeat[i] = 0;
-				m_rgflSuitNoRepeatTime[i] = 0.0;
-				iempty = i;
-				break;
-				}
-			else
-				{
-				// don't play, still marked as norepeat
-				return;
-				}
-			}
-		// keep track of empty slot
-		if (!m_rgiSuitNoRepeat[i])
-			iempty = i;
-	}
-
-	// sentence is not in norepeat list, save if norepeat time was given
-
-	if (iNoRepeatTime)
-	{
-		if (iempty < 0)
-			iempty = RANDOM_LONG(0, CSUITNOREPEAT-1); // pick random slot to take over
-		m_rgiSuitNoRepeat[iempty] = isentence;
-		m_rgflSuitNoRepeatTime[iempty] = iNoRepeatTime + gpGlobals->time;
-	}
-
-	// find empty spot in queue, or overwrite last spot
-	
-	m_rgSuitPlayList[m_iSuitPlayNext++] = isentence;
-	if (m_iSuitPlayNext == CSUITPLAYLIST)
-		m_iSuitPlayNext = 0;
-
-	if (m_flSuitUpdate <= gpGlobals->time)
-	{
-		if (m_flSuitUpdate == 0)
-			// play queue is empty, don't delay too long before playback
-			m_flSuitUpdate = gpGlobals->time + SUITFIRSTUPDATETIME;
-		else 
-			m_flSuitUpdate = gpGlobals->time + SUITUPDATETIME; 
-	}
-
+	return;
 }
 
 /*
@@ -2797,7 +2712,7 @@ void CBasePlayer::Spawn( void )
 	m_iStepLeft = 0;
 	m_flFieldOfView		= 0.5;// some monsters use this to determine whether or not the player is looking at them.
 
-	m_bloodColor	= BLOOD_COLOR_RED;
+	m_bloodColor	= BLOOD_COLOR_YELLOW;
 	m_flNextAttack	= UTIL_WeaponTimeBase();
 	StartSneaking();
 
@@ -2848,7 +2763,9 @@ void CBasePlayer::Spawn( void )
 	
 	m_flNextChatTime = gpGlobals->time;
 
-	g_pGameRules->PlayerSpawn( this );
+	// hack to fix bug in transition to unforseen consequences
+	if ( !HasWeapons() )
+		g_pGameRules->PlayerSpawn( this );
 }
 
 
@@ -2893,6 +2810,10 @@ void CBasePlayer :: Precache( void )
 
 	if ( gInitHUD )
 		m_fInitHUD = TRUE;
+
+	// hack to fix bug in transition to unforseen consequences
+	if ( !HasWeapons() )
+		g_pGameRules->PlayerSpawn( this );
 }
 
 
@@ -2938,7 +2859,7 @@ int CBasePlayer::Restore( CRestore &restore )
 	pev->fixangle = TRUE;           // turn this way immediately
 
 // Copied from spawn() for now
-	m_bloodColor	= BLOOD_COLOR_RED;
+	m_bloodColor	= BLOOD_COLOR_YELLOW;
 
     g_ulModelIndexPlayer = pev->modelindex;
 
@@ -4641,19 +4562,7 @@ LINK_ENTITY_TO_CLASS( player_weaponstrip, CStripWeapons );
 
 void CStripWeapons :: Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
 {
-	CBasePlayer *pPlayer = NULL;
-
-	if ( pActivator && pActivator->IsPlayer() )
-	{
-		pPlayer = (CBasePlayer *)pActivator;
-	}
-	else if ( !g_pGameRules->IsDeathmatch() )
-	{
-		pPlayer = (CBasePlayer *)CBaseEntity::Instance( g_engfuncs.pfnPEntityOfEntIndex( 1 ) );
-	}
-
-	if ( pPlayer )
-		pPlayer->RemoveAllItems( FALSE );
+	return;
 }
 
 

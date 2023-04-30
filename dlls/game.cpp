@@ -280,6 +280,15 @@ cvar_t	sk_sentry_health3 = {"sk_sentry_health3","0"};
 
 // PLAYER WEAPONS
 
+// ISlave weapon
+cvar_t sk_plr_islave1 = {"sk_plr_islave1","0"};
+cvar_t sk_plr_islave2 = {"sk_plr_islave2","0"};
+cvar_t sk_plr_islave3 = {"sk_plr_islave3","0"};
+
+cvar_t sk_plr_islavezap1 = {"sk_plr_islavezap1","0"};
+cvar_t sk_plr_islavezap2 = {"sk_plr_islavezap2","0"};
+cvar_t sk_plr_islavezap3 = {"sk_plr_islavezap3","0"};
+
 // Crowbar whack
 cvar_t	sk_plr_crowbar1 = {"sk_plr_crowbar1","0"};
 cvar_t	sk_plr_crowbar2 = {"sk_plr_crowbar2","0"};
@@ -447,6 +456,10 @@ cvar_t	sk_player_leg2	= { "sk_player_leg2","1" };
 cvar_t	sk_player_leg3	= { "sk_player_leg3","1" };
 
 // END Cvars for Skill Level settings
+
+// alien mode stuff
+cvar_t sv_alien_alt_melee = { "sv_alien_alt_melee","0" };
+cvar_t sv_alien_gibberish = { "sv_alien_gibberish","0" };
 
 // Register your console variables here
 // This gets called one time when the game is initialied
@@ -716,6 +729,15 @@ void GameDLLInit( void )
 
 	// PLAYER WEAPONS
 
+	// ISlave weapon
+	CVAR_REGISTER ( &sk_plr_islave1 );// {"sk_plr_islave1","0"};
+	CVAR_REGISTER ( &sk_plr_islave2 );// {"sk_plr_islave2","0"};
+	CVAR_REGISTER ( &sk_plr_islave3 );// {"sk_plr_islave3","0"};
+
+	CVAR_REGISTER ( &sk_plr_islavezap1 );// {"sk_plr_islavezap1","0"};
+	CVAR_REGISTER ( &sk_plr_islavezap2 );// {"sk_plr_islavezap2","0"};
+	CVAR_REGISTER ( &sk_plr_islavezap3 );// {"sk_plr_islavezap3","0"};
+
 	// Crowbar whack
 	CVAR_REGISTER ( &sk_plr_crowbar1 );// {"sk_plr_crowbar1","0"};
 	CVAR_REGISTER ( &sk_plr_crowbar2 );// {"sk_plr_crowbar2","0"};
@@ -881,6 +903,10 @@ void GameDLLInit( void )
 	CVAR_REGISTER ( &sk_player_leg2 );
 	CVAR_REGISTER ( &sk_player_leg3 );
 // END REGISTER CVARS FOR SKILL LEVEL STUFF
+
+// alien mode stuff
+	CVAR_REGISTER ( &sv_alien_alt_melee );
+	CVAR_REGISTER ( &sv_alien_gibberish );
 
 	SERVER_COMMAND( "exec skill.cfg\n" );
 }

@@ -384,6 +384,8 @@ void W_Precache(void)
 	UTIL_PrecacheOtherWeapon( "weapon_hornetgun" );
 #endif
 
+	UTIL_PrecacheOtherWeapon( "weapon_islave" );
+
 
 #if !defined( OEM_BUILD ) && !defined( HLDEMO_BUILD )
 	if ( g_pGameRules->IsDeathmatch() )
@@ -605,23 +607,26 @@ void CBasePlayerItem::DefaultTouch( CBaseEntity *pOther )
 
 	CBasePlayer *pPlayer = (CBasePlayer *)pOther;
 
-	// can I have this?
-	if ( !g_pGameRules->CanHavePlayerItem( pPlayer, this ) )
+	if ( gEvilImpulse101 || FClassnameIs( pev, "weapon_islave" ) )
 	{
-		if ( gEvilImpulse101 )
+		// can I have this?
+		if ( !g_pGameRules->CanHavePlayerItem( pPlayer, this ) )
 		{
-			UTIL_Remove( this );
+			if ( gEvilImpulse101 )
+			{
+				UTIL_Remove( this );
+			}
+			return;
 		}
-		return;
-	}
 
-	if (pOther->AddPlayerItem( this ))
-	{
-		AttachToPlayer( pPlayer );
-		EMIT_SOUND(ENT(pPlayer->pev), CHAN_ITEM, "items/gunpickup2.wav", 1, ATTN_NORM);
-	}
+		if (pOther->AddPlayerItem( this ))
+		{
+			AttachToPlayer( pPlayer );
+			EMIT_SOUND(ENT(pPlayer->pev), CHAN_ITEM, "items/gunpickup2.wav", 1, ATTN_NORM);
+		}
 
-	SUB_UseTargets( pOther, USE_TOGGLE, 0 ); // UNDONE: when should this happen?
+		SUB_UseTargets( pOther, USE_TOGGLE, 0 ); // UNDONE: when should this happen?
+	}
 }
 
 BOOL CanAttack( float attack_time, float curtime, BOOL isPredicted )
@@ -1094,32 +1099,35 @@ void CBasePlayerAmmo::Materialize( void )
 	SetTouch(&CBasePlayerAmmo::DefaultTouch );
 }
 
-void CBasePlayerAmmo :: DefaultTouch( CBaseEntity *pOther )
+void CBasePlayerAmmo::DefaultTouch(CBaseEntity* pOther)
 {
-	if ( !pOther->IsPlayer() )
+	if (!pOther->IsPlayer())
 	{
 		return;
 	}
 
-	if (AddAmmo( pOther ))
+	if (gEvilImpulse101)
 	{
-		if ( g_pGameRules->AmmoShouldRespawn( this ) == GR_AMMO_RESPAWN_YES )
+		if (AddAmmo(pOther))
 		{
-			Respawn();
+			if (g_pGameRules->AmmoShouldRespawn(this) == GR_AMMO_RESPAWN_YES)
+			{
+				Respawn();
+			}
+			else
+			{
+				SetTouch(NULL);
+				SetThink(&CBasePlayerAmmo::SUB_Remove);
+				pev->nextthink = gpGlobals->time + .1;
+			}
 		}
-		else
+		else if (gEvilImpulse101)
 		{
-			SetTouch( NULL );
-			SetThink(&CBaseEntity::SUB_Remove);
+			// evil impulse 101 hack, kill always
+			SetTouch(NULL);
+			SetThink(&CBasePlayerAmmo::SUB_Remove);
 			pev->nextthink = gpGlobals->time + .1;
 		}
-	}
-	else if (gEvilImpulse101)
-	{
-		// evil impulse 101 hack, kill always
-		SetTouch( NULL );
-		SetThink(&CBaseEntity::SUB_Remove);
-		pev->nextthink = gpGlobals->time + .1;
 	}
 }
 
@@ -1523,6 +1531,14 @@ void CBasePlayerWeapon::PrintState( void )
 	ALERT( at_console, "m_iclip:  %i\n", m_iClip );
 }
 
+TYPEDESCRIPTION CWeaponISlave::m_SaveData[] =
+{
+	DEFINE_FIELD( CWeaponISlave, m_iSwing, FIELD_INTEGER ),
+	DEFINE_FIELD( CWeaponISlave, m_flZapTime, FIELD_TIME ),
+	DEFINE_FIELD( CWeaponISlave, m_flUpdateBeamTime, FIELD_TIME ),
+	DEFINE_FIELD( CWeaponISlave, m_iHudState, FIELD_INTEGER ),
+};
+IMPLEMENT_SAVERESTORE( CWeaponISlave, CBasePlayerWeapon );
 
 TYPEDESCRIPTION	CRpg::m_SaveData[] = 
 {

@@ -23,6 +23,7 @@
 
 // For holograms, make them not solid so the player can walk through them
 #define	SF_GENERICMONSTER_NOTSOLID					4 
+#define SF_TURNHEAD									8
 
 //=========================================================
 // Monster's Anim Events Go Here
@@ -37,7 +38,42 @@ public:
 	int  Classify ( void );
 	void HandleAnimEvent( MonsterEvent_t *pEvent );
 	int ISoundMask ( void );
+
+	void KeyValue( KeyValueData *pkvd );
+	void PlayScriptedSentence( const char *pszSentence, float duration, float volume, float attenuation, BOOL bConcurrent, CBaseEntity *pListener );
+	void MonsterThink();
+	void IdleHeadTurn( Vector &vecFriend );
+	int TakeDamage( entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType );
+	int Save( CSave &save );
+	int Restore( CRestore &restore );
+
+	static TYPEDESCRIPTION m_SaveData[];
+
+	float m_talkTime;
+	EHANDLE m_hTalkTarget;
+	float m_flIdealYaw;
+	float m_flCurrentYaw;
+	int m_nNumHits;
+	int m_nNumNoHits;
+	int m_nTriggerHits;
+	string_t m_iszTargetTrigger;
+	string_t m_iszNoTargetTrigger;
 };
+
+TYPEDESCRIPTION CGenericMonster::m_SaveData[] = {
+	DEFINE_FIELD( CGenericMonster, m_talkTime, FIELD_FLOAT ), // gearbox moment: should be FIELD_TIME
+	DEFINE_FIELD( CGenericMonster, m_hTalkTarget, FIELD_EHANDLE ),
+	DEFINE_FIELD( CGenericMonster, m_flIdealYaw, FIELD_FLOAT ),
+	DEFINE_FIELD( CGenericMonster, m_flCurrentYaw, FIELD_FLOAT ),
+	DEFINE_FIELD( CGenericMonster, m_nNumHits, FIELD_INTEGER ),
+	DEFINE_FIELD( CGenericMonster, m_nNumNoHits, FIELD_INTEGER ),
+	DEFINE_FIELD( CGenericMonster, m_nTriggerHits, FIELD_INTEGER ),
+	DEFINE_FIELD( CGenericMonster, m_iszTargetTrigger, FIELD_STRING ),
+	DEFINE_FIELD( CGenericMonster, m_iszNoTargetTrigger, FIELD_STRING )
+};
+
+IMPLEMENT_SAVERESTORE( CGenericMonster, CBaseMonster );
+
 LINK_ENTITY_TO_CLASS( monster_generic, CGenericMonster );
 
 //=========================================================
@@ -46,6 +82,9 @@ LINK_ENTITY_TO_CLASS( monster_generic, CGenericMonster );
 //=========================================================
 int	CGenericMonster :: Classify ( void )
 {
+	if ( pev->spawnflags & 0x2000 )
+		return CLASS_NONE;
+
 	return	CLASS_PLAYER_ALLY;
 }
 
@@ -113,8 +152,16 @@ void CGenericMonster :: Spawn()
 
 	pev->solid			= SOLID_SLIDEBOX;
 	pev->movetype		= MOVETYPE_STEP;
-	m_bloodColor		= BLOOD_COLOR_RED;
-	pev->health			= 8;
+
+	if ( !m_iszKillTarget && !m_iszNoTargetTrigger )
+		m_bloodColor = BLOOD_COLOR_RED;
+	else
+		m_bloodColor = DONT_BLEED;
+
+	if ( pev->max_health > 0.0 )
+		pev->health = pev->max_health;
+	else
+		pev->health			= 8;
 	m_flFieldOfView		= 0.5;// indicates the width of this monster's forward view cone ( as a dotproduct result )
 	m_MonsterState		= MONSTERSTATE_NONE;
 
@@ -124,6 +171,11 @@ void CGenericMonster :: Spawn()
 	{
 		pev->solid = SOLID_NOT;
 		pev->takedamage = DAMAGE_NO;
+	}
+
+	if ( pev->spawnflags & SF_TURNHEAD )
+	{
+		m_afCapability = bits_CAP_TURN_HEAD;
 	}
 }
 
@@ -138,3 +190,108 @@ void CGenericMonster :: Precache()
 //=========================================================
 // AI Schedules Specific to this monster
 //=========================================================
+
+void CGenericMonster::KeyValue( KeyValueData *pkvd )
+{
+	if ( FStrEq( pkvd->szKeyName, "target_trigger" ) )
+	{
+		m_iszTargetTrigger = ALLOC_STRING( pkvd->szValue );
+		pkvd->fHandled = TRUE;
+	}
+	else if ( FStrEq( pkvd->szKeyName, "no_target_trigger" ) )
+	{
+		m_iszNoTargetTrigger = ALLOC_STRING( pkvd->szValue );
+		pkvd->fHandled = TRUE;
+	}
+	else if ( FStrEq( pkvd->szKeyName, "trigger_hits" ) )
+	{
+		m_nTriggerHits = atoi( pkvd->szValue );
+		pkvd->fHandled = TRUE;
+	}
+	else
+	{
+		CBaseMonster::KeyValue( pkvd );
+	}
+}
+
+void CGenericMonster::PlayScriptedSentence( const char *pszSentence, float duration, float volume, float attenuation, BOOL bConcurrent, CBaseEntity *pListener )
+{
+	CBaseMonster::PlayScriptedSentence( pszSentence, duration, volume, attenuation, bConcurrent, pListener );
+
+	m_talkTime = gpGlobals->time + duration;
+	m_hTalkTarget = pListener;
+}
+
+void CGenericMonster::MonsterThink()
+{
+	if ( m_afCapability & bits_CAP_TURN_HEAD )
+	{
+		CBaseEntity *pTalkTarget = m_hTalkTarget;
+
+		if ( pTalkTarget )
+		{
+			if ( m_talkTime >= gpGlobals->time )
+			{
+				IdleHeadTurn( pTalkTarget->pev->origin );
+			}
+			else
+			{
+				m_flIdealYaw = 0.0;
+				m_hTalkTarget = NULL;
+			}
+		}
+
+		if ( m_flIdealYaw != m_flCurrentYaw )
+		{
+			if ( m_flIdealYaw < m_flCurrentYaw )
+				m_flCurrentYaw -= min( m_flCurrentYaw - m_flIdealYaw, 20.0 );
+			else
+				m_flCurrentYaw += min( m_flIdealYaw - m_flCurrentYaw, 20.0 );
+		}
+
+		SetBoneController( 0, m_flCurrentYaw );
+	}
+
+	CBaseMonster::MonsterThink();
+}
+
+void CGenericMonster::IdleHeadTurn( Vector &vecFriend )
+{
+	// turn head in desired direction only if ent has a turnable head
+	if ( m_afCapability & bits_CAP_TURN_HEAD )
+	{
+		float yaw = VecToYaw( vecFriend - pev->origin ) - pev->angles.y;
+
+		if ( yaw > 180 )
+			yaw -= 360;
+		if ( yaw < -180 )
+			yaw += 360;
+
+		m_flIdealYaw = yaw;
+	}
+}
+
+int CGenericMonster::TakeDamage( entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType )
+{
+	if ( !FNullEnt( pevAttacker ) )
+	{
+		CBaseEntity *pAttacker = CBaseEntity::Instance( pevAttacker );
+
+		if ( m_iszTargetTrigger && pAttacker->IsPlayer() )
+		{
+			// there's a check here that determines if the player used auto-aim to hit us
+			// but since that's not implemented here, let's always claim that auto-aim was used
+			m_nNumNoHits = 0;
+			m_nNumHits++;
+		}
+
+		if ( m_nNumHits >= m_nTriggerHits )
+		{
+			FireTargets( STRING( m_iszTargetTrigger ), this, this, USE_TOGGLE, 0 );
+			m_nNumHits = 0;
+			m_nNumNoHits = 0;
+		}
+	}
+
+	return CBaseMonster::TakeDamage( pevInflictor, pevAttacker, flDamage, bitsDamageType );
+}

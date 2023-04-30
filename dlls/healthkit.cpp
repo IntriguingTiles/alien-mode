@@ -68,31 +68,6 @@ void CHealthKit::Precache( void )
 
 BOOL CHealthKit::MyTouch( CBasePlayer *pPlayer )
 {
-	if ( pPlayer->pev->deadflag != DEAD_NO )
-	{
-		return FALSE;
-	}
-
-	if ( pPlayer->TakeHealth( gSkillData.healthkitCapacity, DMG_GENERIC ) )
-	{
-		MESSAGE_BEGIN( MSG_ONE, gmsgItemPickup, NULL, pPlayer->pev );
-			WRITE_STRING( STRING(pev->classname) );
-		MESSAGE_END();
-
-		EMIT_SOUND(ENT(pPlayer->pev), CHAN_ITEM, "items/smallmedkit1.wav", 1, ATTN_NORM);
-
-		if ( g_pGameRules->ItemShouldRespawn( this ) )
-		{
-			Respawn();
-		}
-		else
-		{
-			UTIL_Remove(this);	
-		}
-
-		return TRUE;
-	}
-
 	return FALSE;
 }
 
@@ -229,7 +204,7 @@ void CWallHealth::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE u
 
 
 	// charge the player
-	if ( pActivator->TakeHealth( 1, DMG_GENERIC ) )
+	if ( pActivator->TakeDamage( pActivator->pev, pActivator->pev, 1, DMG_GENERIC ) )
 	{
 		m_iJuice--;
 	}

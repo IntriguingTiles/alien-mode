@@ -24,6 +24,7 @@
 #include "saverestore.h"
 #include "squadmonster.h"
 #include "plane.h"
+#include "studio.h"
 
 //=========================================================
 // Save/Restore
@@ -437,7 +438,19 @@ void CSquadMonster :: StartMonster( void )
 
 		if ( IsLeader() && FClassnameIs ( pev, "monster_human_grunt" ) )
 		{
-			SetBodygroup( 1, 1 ); // UNDONE: truly ugly hack
+			studiohdr_t *pstudiohdr = (studiohdr_t *)GET_MODEL_PTR( ENT( pev ) );
+
+			if ( !pstudiohdr )
+			{
+				ALERT( at_console, "Couldn't get studiohdr for hgrunt!\n" );
+				return;
+			}
+
+			if ( pstudiohdr->bodypartindex == 235568 )
+				SetBodygroup( 1, 3 );
+			else
+				SetBodygroup( 1, 1 ); // UNDONE: truly ugly hack
+
 			pev->skin = 0;
 		}
 

@@ -133,6 +133,7 @@
     <ClCompile Include="..\dlls\shotgun.cpp" />
     <ClCompile Include="..\dlls\squeakgrenade.cpp" />
     <ClCompile Include="..\dlls\tripmine.cpp" />
+    <ClCompile Include="..\dlls\weapon_islave.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\hl_wpn_glock.cpp" />
     <ClCompile Include="..\game_shared\vgui_checkbutton2.cpp" />
     <ClCompile Include="..\game_shared\vgui_grid.cpp" />
@@ -167,6 +168,7 @@
     <ClCompile Include="hl\hl_objects.cpp" />
     <ClCompile Include="hl\hl_weapons.cpp" />
     <ClCompile Include="hud.cpp" />
+    <ClCompile Include="hud_islave.cpp" />
     <ClCompile Include="hud_msg.cpp" />
     <ClCompile Include="hud_redraw.cpp" />
     <ClCompile Include="hud_servers.cpp" />
