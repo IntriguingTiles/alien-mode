@@ -14,10 +14,10 @@ public:
 	void Precache( void );
 	EXPORT void LiquidThink( void );
 	void SetLiquid( int liquid );
-	void SetSloshing( BOOL sloshing );
+	void SetSloshing( bool sloshing );
 	int ObjectCaps( void ) { return CBaseAnimating::ObjectCaps(); }
-	int Save( CSave &save );
-	int Restore( CRestore &restore );
+	bool Save( CSave &save );
+	bool Restore( CRestore &restore );
 
 	static TYPEDESCRIPTION m_SaveData[];
 
@@ -50,8 +50,8 @@ void CWallHealthNewCanister::Spawn()
 	SetBoneController( 0, 0.0 );
 	SetThink( &CWallHealthNewCanister::LiquidThink );
 	pev->nextthink = gpGlobals->time + 0.1;
-	m_fSettling = FALSE;
-	m_fDraining = FALSE;
+	m_fSettling = false;
+	m_fDraining = false;
 }
 
 void CWallHealthNewCanister::Precache()
@@ -69,7 +69,7 @@ void CWallHealthNewCanister::LiquidThink()
 		if ( m_fSettling )
 		{
 			pev->sequence = LookupSequence( "still" );
-			m_fSettling = FALSE;
+			m_fSettling = false;
 		}
 
 		pev->frame = 0.0;
@@ -84,14 +84,14 @@ void CWallHealthNewCanister::SetLiquid( int liquid )
 	SetBoneController( 0, (float)liquid * 0.1 + -11.0 );
 }
 
-void CWallHealthNewCanister::SetSloshing( BOOL sloshing )
+void CWallHealthNewCanister::SetSloshing( bool sloshing )
 {
 	if ( sloshing )
 	{
 		if ( !m_fDraining )
 		{
-			m_fSettling = FALSE;
-			m_fDraining = TRUE;
+			m_fSettling = false;
+			m_fDraining = true;
 			pev->sequence = LookupSequence( "slosh" );
 			pev->frame = 0.0;
 			ResetSequenceInfo();
@@ -101,8 +101,8 @@ void CWallHealthNewCanister::SetSloshing( BOOL sloshing )
 	{
 		if ( m_fDraining )
 		{
-			m_fDraining = FALSE;
-			m_fSettling = TRUE;
+			m_fDraining = false;
+			m_fSettling = true;
 			pev->sequence = LookupSequence( "to_rest" );
 			pev->frame = 0.0;
 			ResetSequenceInfo();
@@ -127,18 +127,18 @@ class CWallHealthNew : public CBaseToggle
 public:
 	void Spawn( void );
 	void Precache( void );
-	void KeyValue( KeyValueData *pkvd );
+	bool KeyValue( KeyValueData *pkvd );
 	EXPORT void Think1( void );
 	EXPORT void Think2( void );
 	void Recharge( void );
 	void Off( void );
-	BOOL FindPlayer( void );
+	bool FindPlayer( void );
 	void DetermineYaw( void );
 	float VecToYaw( Vector vecDir );
 	void Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
 	int ObjectCaps() { return ( CBaseToggle::ObjectCaps() | FCAP_CONTINUOUS_USE ); }
-	int Save( CSave &save );
-	int Restore( CRestore &restore );
+	bool Save( CSave &save );
+	bool Restore( CRestore &restore );
 
 	static TYPEDESCRIPTION m_SaveData[];
 
@@ -185,7 +185,7 @@ IMPLEMENT_SAVERESTORE( CWallHealthNew, CBaseToggle );
 
 LINK_ENTITY_TO_CLASS( item_healthcharger, CWallHealthNew );
 
-void CWallHealthNew::KeyValue( KeyValueData *pkvd )
+bool CWallHealthNew::KeyValue( KeyValueData *pkvd )
 {
 		if (	FStrEq(pkvd->szKeyName, "style") ||
 				FStrEq(pkvd->szKeyName, "height") ||
@@ -193,12 +193,12 @@ void CWallHealthNew::KeyValue( KeyValueData *pkvd )
 				FStrEq(pkvd->szKeyName, "value2") ||
 				FStrEq(pkvd->szKeyName, "value3"))
 	{
-		pkvd->fHandled = TRUE;
+		return true;
 	}
 	else if (FStrEq(pkvd->szKeyName, "dmdelay"))
 	{
 		m_flReactivate = atof(pkvd->szValue);
-		pkvd->fHandled = TRUE;
+		return true;
 	}
 	else
 		CBaseToggle::KeyValue( pkvd );
@@ -267,9 +267,9 @@ void CWallHealthNew::Spawn()
 
 	m_hCanister = SpawnHealthCanister( &pev->origin, &pev->angles );
 	m_flNextReactivate = 0.0;
-	m_fPlayerIsNear = FALSE;
+	m_fPlayerIsNear = false;
 	m_iIdleState = 0;
-	m_fLightsOn = FALSE;
+	m_fLightsOn = false;
 	pev->movetype = MOVETYPE_PUSH;
 	pev->skin = 0;
 	pev->sequence = LookupSequence( "still" );
@@ -308,7 +308,7 @@ void CWallHealthNew::Think2()
 {
 	if ( field_0x118 != 0 && m_fLightsOn )
 	{
-		m_fLightsOn = FALSE;
+		m_fLightsOn = false;
 		field_0x118 = 0;
 	}
 
@@ -369,7 +369,7 @@ void CWallHealthNew::Think2()
 				pev->sequence = LookupSequence( "deploy" );
 				pev->frame = 0.0;
 				ResetSequenceInfo();
-				m_fPlayerIsNear = TRUE;
+				m_fPlayerIsNear = true;
 				EMIT_SOUND( ENT( pev ), CHAN_ITEM, "items/medshot4.wav", 1.0, ATTN_NORM );
 				m_flSoundTime = gpGlobals->time + 0.56;
 			}
@@ -421,7 +421,7 @@ void CWallHealthNew::Think2()
 		pev->sequence = LookupSequence( "retract_arm" );
 		pev->frame = 0.0;
 		ResetSequenceInfo();
-		m_fPlayerIsNear = FALSE;
+		m_fPlayerIsNear = false;
 	}
 
 	pev->nextthink = pev->ltime + 0.1;
@@ -445,7 +445,7 @@ void CWallHealthNew::Off()
 	pev->sequence = LookupSequence( "retract_shot" );
 	pev->frame = 0.0;
 	ResetSequenceInfo();
-	( (CWallHealthNewCanister *)( (CBaseEntity *)m_hCanister ) )->SetSloshing( FALSE );
+	( (CWallHealthNewCanister *)( (CBaseEntity *)m_hCanister ) )->SetSloshing( false );
 
 	if ( m_iJuice == 0 )
 	{
@@ -460,7 +460,7 @@ void CWallHealthNew::Off()
 	m_flOffTime = 0.0;
 }
 
-BOOL CWallHealthNew::FindPlayer()
+bool CWallHealthNew::FindPlayer()
 {
 	if ( gpGlobals->maxClients > 0 )
 	{
@@ -477,12 +477,12 @@ BOOL CWallHealthNew::FindPlayer()
 						if ( FVisible( pPlayer->pev->origin ) )
 						{
 							m_hPlayer = pPlayer;
-							return TRUE;
+							return true;
 						}
 					}
 					else
 					{
-						return TRUE;
+						return true;
 					}
 				}
 			}
@@ -490,7 +490,7 @@ BOOL CWallHealthNew::FindPlayer()
 	}
 
 	m_hPlayer = NULL;
-	return FALSE;
+	return false;
 }
 
 void CWallHealthNew::DetermineYaw()
@@ -614,7 +614,7 @@ void CWallHealthNew::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYP
 		m_iOn++;
 		EMIT_SOUND( ENT( pev ), CHAN_ITEM, "items/medshot4.wav", 1.0, ATTN_NORM );
 		m_flSoundTime = gpGlobals->time + 0.56;
-		pCanister->SetSloshing( TRUE );
+		pCanister->SetSloshing( true );
 		pev->sequence = LookupSequence( "give_shot" );
 		pev->frame = 0.0;
 		ResetSequenceInfo();

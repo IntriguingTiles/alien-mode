@@ -1,4 +1,3 @@
-
 #
 # Half-life Makefile for x86 Linux
 #
@@ -20,101 +19,43 @@ PM_SRC_DIR=$(SOURCE_DIR)/pm_shared
 GAME_SHARED_SRC_DIR=$(SOURCE_DIR)/game_shared
 PUBLIC_SRC_DIR=$(SOURCE_DIR)/public
 
-
 BUILD_OBJ_DIR=$(BUILD_DIR)/obj
 
 ARCH=i386
 ELF-GC-DYNSTR=./elf-gc-dynstr
 
-ifeq ($(OS),Linux)
-	CPLUS="g++ -m32"
-	CPP_LIB:=-L$(shell g++ -m32 -print-file-name=libstdc++.so | xargs dirname) -lstdc++ -ldl -lpthread
+ifeq "$(COMPILER)" ""
+	COMPILER=g++
 endif
 
-ifeq ($(OS),Darwin)
-	OSXVER := $(shell sw_vers -productVersion)
-	DEVELOPER_DIR := $(shell /usr/bin/xcode-select -print-path)
-	ifeq (,$(findstring 10.7, $(OSXVER))) 
-		BUILDING_ON_LION := 0
-		COMPILER_BIN_DIR := $(DEVELOPER_DIR)/usr/bin
-		SDK_DIR := $(DEVELOPER_DIR)/SDKs
-	else
-		BUILDING_ON_LION := 1
-		COMPILER_BIN_DIR := $(DEVELOPER_DIR)/Toolchains/XcodeDefault.xctoolchain/usr/bin
-		SDK_DIR := $(DEVELOPER_DIR)/Platforms/MacOSX.platform/Developer/SDKs
-	endif
+CPLUS="$(COMPILER) -m32"
+CPP_LIB:=-L$(shell g++ -m32 -print-file-name=libstdc++.so | xargs dirname) -lstdc++ -ldl -lpthread
 
-	#SDKROOT ?= $(SDK_DIR)/MacOSX10.6.sdk
-	SDKROOT ?= $(SDK_DIR)/MacOSX10.8.sdk
-
-	ARCH_FLAGS ?= -arch i386 -m32 -march=prescott -gdwarf-2 -g2  -Wno-typedef-redefinition -momit-leaf-frame-pointer -mtune=core2
-	CPP_LIB=-lstdc++ -lpthread
-
-	ifeq ($(origin AR), default)
-		AR = libtool -static -o
-	endif
-	ifeq ($(origin CXX), default)
-		CPLUS ="$(COMPILER_BIN_DIR)/clang++ -Qunused-arguments -isysroot $(SDKROOT) -mmacosx-version-min=10.5 -fasm-blocks -I$(SDKROOT)/usr/include/malloc $(ARCH_FLAGS)"
-	endif
-	LINK ?= $(CXX)
-endif
-
-CLINK=$(CPLUS)
+ARCH_CFLAGS=-march=pentium-m -mfpmath=387 -mno-sse
 
 ifeq "$(CFG)" "release"
-	ARCH_CFLAGS_I486=-O3 
-	ARCH_CFLAGS_I686=-O3 
-	ARCH_CFLAGS_AMD=-O3 
-	ARCH_CFLAGS_AMD64=-m64 -O3 
+	ARCH_CFLAGS+=-O3 
 else
-	ARCH_CFLAGS_I486=-gdwarf-2 -g2 
-	ARCH_CFLAGS_I686=-gdwarf-2 -g2 
-	ARCH_CFLAGS_AMD=-gdwarf-2 -g2 
-	ARCH_CFLAGS_AMD64=-m64 -gdwarf-2 -g2 
+	ARCH_CFLAGS+=-gdwarf-2 -g2 
 endif
 
-ifeq ($(OS),Linux)
-	ARCH_CFLAGS_I486+=-march=pentium-m -mfpmath=387
-	ARCH_CFLAGS_I686+=-march=pentium-m -mfpmath=387
-	ARCH_CFLAGS_AMD+=-march=k6 -mfpmath=387
+BASE_CFLAGS=-std=c++17 -fpermissive -fno-strict-aliasing -fno-exceptions -fexpensive-optimizations -Werror=return-type -w
+BASE_CFLAGS+=-DNDEBUG -DPOSIX -D_POSIX -DLINUX -D_LINUX -DGNUC -DNO_MALLOC_OVERRIDE -DCLIENT_WEAPONS
+
+# flifetime-dse=1 is needed to disable a compiler optimization that optimizes out std::memset calls in CBaseEntity::operator new
+# See https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html#index-flifetime-dse for more information about the flifetime-dse flag
+ifeq "$(COMPILER)" "g++"
+	BASE_CFLAGS+=-flifetime-dse=1
 endif
 
-ifeq ($(OS),Darwin)
-	# force 387 for FP math so the precision between win32 and linux and osx match
-	ARCH_CFLAGS_I486+=-march=pentium-m -mfpmath=387
-	ARCH_CFLAGS_I686+=-march=pentium-m -mfpmath=387
-	ARCH_CFLAGS_AMD+=-mfpmath=387
-endif
-
-
-ARCH_CFLAGS="$(ARCH_CFLAGS_I486)"
-
-BASE_CFLAGS=-fpermissive -fno-strict-aliasing -DNDEBUG -DPOSIX -D_POSIX -DLINUX -D_LINUX -DGNUC -Dstricmp=strcasecmp -D_strnicmp=strncasecmp -Dstrnicmp=strncasecmp -D_snprintf=snprintf -D_alloca=alloca -fno-exceptions -fexpensive-optimizations -D_vsnprintf=vsnprintf -DNO_MALLOC_OVERRIDE -Werror=return-type
-BASE_CFLAGS+=-w
-
-ifeq ($(OS),Darwin)
-	BASE_CFLAGS += -DOSX -D_OSX -fvisibility=hidden
+SHLIBEXT=so
+SHLIBCFLAGS=
+ifeq "$(CFG)" "release"
+	SHLIBLDFLAGS="-shared -Wl,-Map,$@_map.txt"
 else
-	BASE_CFLAGS+= -DLINUX -D_LINUX
+	SHLIBLDFLAGS="-shared -gdwarf-2 -g2 -Wl,-Map,$@_map.txt"
 endif
 
-ifeq ($(OS),Darwin)
-	SHLIBEXT=dylib
-	SHLIBCFLAGS=
-	ifeq "$(CFG)" "release"
-		SHLIBLDFLAGS="-shared"
-	else
-		SHLIBLDFLAGS="-shared -gdwarf-2 -g2"
-	endif
-else
-	SHLIBEXT=so
-	SHLIBCFLAGS=
-	ifeq "$(CFG)" "release"
-		SHLIBLDFLAGS="-shared -Wl,-Map,$@_map.txt"
-	else
-		SHLIBLDFLAGS="-shared -gdwarf-2 -g2 -Wl,-Map,$@_map.txt"
-	endif
-endif
 AR=ar
 LIBEXT=a
 MAKE+= -j8
@@ -135,17 +76,16 @@ TARGETS+= \
 	hl_cdll \
 
 build_dir:
-	-mkdir $(BUILD_DIR);
+	-mkdir -p $(BUILD_DIR);
 	cd $(BUILD_DIR)
 
 targets: $(TARGETS)
 
-
 hl_cdll: build_dir
-	$(MAKE_HL_CDLL) ARCH=i686 CPLUS=$(CPLUS) CPP_LIB="$(CPP_LIB)" BUILD_DIR=$(BUILD_DIR) BUILD_OBJ_DIR=$(BUILD_OBJ_DIR) SOURCE_DIR=$(SOURCE_DIR) ENGINE_SRC_DIR=$(ENGINE_SRC_DIR) COMMON_SRC_DIR=$(COMMON_SRC_DIR) BASE_CFLAGS="$(BASE_CFLAGS)" PUBLIC_SRC_DIR=$(PUBLIC_SRC_DIR) ARCH_CFLAGS="$(ARCH_CFLAGS_I686)" GAME_SHARED_SRC_DIR=$(GAME_SHARED_SRC_DIR) CLINK=$(CLINK) PM_SRC_DIR=$(PM_SRC_DIR) SHLIBEXT=$(SHLIBEXT) SHLIBCFLAGS=$(SHLIBCFLAGS) SHLIBLDFLAGS=$(SHLIBLDFLAGS) CFG=$(CFG) OS=$(OS)
+	$(MAKE_HL_CDLL) CPLUS=$(CPLUS) ARCH=$(ARCH) ARCH_CFLAGS="$(ARCH_CFLAGS)" SHLIBEXT=$(SHLIBEXT) SHLIBCFLAGS=$(SHLIBCFLAGS) SHLIBLDFLAGS=$(SHLIBLDFLAGS) CPP_LIB="$(CPP_LIB)" CFG=$(CFG) OS=$(OS) BASE_CFLAGS="$(BASE_CFLAGS)" BUILD_DIR=$(BUILD_DIR) BUILD_OBJ_DIR=$(BUILD_OBJ_DIR) SOURCE_DIR=$(SOURCE_DIR) ENGINE_SRC_DIR=$(ENGINE_SRC_DIR) COMMON_SRC_DIR=$(COMMON_SRC_DIR) PUBLIC_SRC_DIR=$(PUBLIC_SRC_DIR) GAME_SHARED_SRC_DIR=$(GAME_SHARED_SRC_DIR) PM_SRC_DIR=$(PM_SRC_DIR)
 
 hl: build_dir
-	$(MAKE_HL_LIB) CPLUS=$(CPLUS) ARCH=$(ARCH) CPP_LIB="$(CPP_LIB)" BUILD_DIR=$(BUILD_DIR) BUILD_OBJ_DIR=$(BUILD_OBJ_DIR) SOURCE_DIR=$(SOURCE_DIR) ENGINE_SRC_DIR=$(ENGINE_SRC_DIR) COMMON_SRC_DIR=$(COMMON_SRC_DIR) PM_SRC_DIR=$(PM_SRC_DIR) GAME_SHARED_SRC_DIR=$(GAME_SHARED_SRC_DIR) BASE_CFLAGS="$(BASE_CFLAGS)" SHLIBEXT=$(SHLIBEXT) SHLIBCFLAGS=$(SHLIBCFLAGS) SHLIBLDFLAGS=$(SHLIBLDFLAGS) PUBLIC_SRC_DIR=$(PUBLIC_SRC_DIR) CFG=$(CFG) OS=$(OS) ARCH_CFLAGS="$(ARCH_CFLAGS_I686)" 
+	$(MAKE_HL_LIB) CPLUS=$(CPLUS) ARCH=$(ARCH) ARCH_CFLAGS="$(ARCH_CFLAGS)" SHLIBEXT=$(SHLIBEXT) SHLIBCFLAGS=$(SHLIBCFLAGS) SHLIBLDFLAGS=$(SHLIBLDFLAGS) CPP_LIB="$(CPP_LIB)" CFG=$(CFG) OS=$(OS) BASE_CFLAGS="$(BASE_CFLAGS)" BUILD_DIR=$(BUILD_DIR) BUILD_OBJ_DIR=$(BUILD_OBJ_DIR) SOURCE_DIR=$(SOURCE_DIR) ENGINE_SRC_DIR=$(ENGINE_SRC_DIR) COMMON_SRC_DIR=$(COMMON_SRC_DIR) PUBLIC_SRC_DIR=$(PUBLIC_SRC_DIR) GAME_SHARED_SRC_DIR=$(GAME_SHARED_SRC_DIR) PM_SRC_DIR=$(PM_SRC_DIR)
 
 clean:
 	-rm -rf $(BUILD_OBJ_DIR)

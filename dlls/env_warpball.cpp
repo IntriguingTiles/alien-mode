@@ -12,14 +12,14 @@ class CWarpBall : public CBaseEntity
 public:
 	void Spawn( void );
 	void Precache( void );
-	void KeyValue( KeyValueData *pkvd );
+	bool KeyValue( KeyValueData *pkvd );
 	EXPORT void Use1( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
 	void FireWarpBall( void );
 	EXPORT void Think1( void );
 	void MakeMonster( void );
 
-	int Save( CSave &save );
-	int Restore( CRestore &restore );
+	bool Save( CSave &save );
+	bool Restore( CRestore &restore );
 	
 	static TYPEDESCRIPTION m_SaveData[];
 
@@ -83,22 +83,22 @@ CWarpBall *CreateWarpBall( Vector *vecOrigin )
 	return pWarpBall;
 }
 
-void CWarpBall::KeyValue( KeyValueData *pkvd )
+bool CWarpBall::KeyValue( KeyValueData *pkvd )
 {
 	if ( FStrEq( pkvd->szKeyName, "radius" ) )
 	{
 		m_flBeamRadius = atof( pkvd->szValue );
-		pkvd->fHandled = TRUE;
+		return true;
 	}
 	else if ( FStrEq( pkvd->szKeyName, "warp_target" ) )
 	{
 		m_iszWarpTarget = ALLOC_STRING( pkvd->szValue );
-		pkvd->fHandled = TRUE;
+		return true;
 	}
 	else if ( FStrEq( pkvd->szKeyName, "damage_delay" ) )
 	{
 		m_flDamageDelay = atof( pkvd->szValue );
-		pkvd->fHandled = TRUE;
+		return true;
 	}
 	else if ( FStrEq( pkvd->szKeyName, "monstertype" ) )
 	{
@@ -107,17 +107,17 @@ void CWarpBall::KeyValue( KeyValueData *pkvd )
 		else
 			m_iszMonsterClassname = ALLOC_STRING( pkvd->szValue );
 
-		pkvd->fHandled = TRUE;		
+		return true;		
 	}
 	else if ( FStrEq( pkvd->szKeyName, "monsterspawnflags" ) )
 	{
 		m_iMonsterSpawnFlags = atoi( pkvd->szValue );
-		pkvd->fHandled = TRUE;
+		return true;
 	}
 	else if ( FStrEq( pkvd->szKeyName, "maxlivechildren" ) )
 	{
 		m_iMaxLiveChildren = atoi( pkvd->szValue );
-		pkvd->fHandled = TRUE;
+		return true;
 	}
 	else
 	{
@@ -199,7 +199,7 @@ void CWarpBall::FireWarpBall()
 
 	}
 
-	m_fWarpRefire = FALSE;
+	m_fWarpRefire = false;
 
 	SET_MODEL( ENT( pev ), "sprites/warpball.spr" );
 	m_flMaxFrame = MODEL_FRAMES( pev->modelindex ) - 1;
@@ -242,15 +242,15 @@ void CWarpBall::FireWarpBall()
 
 	SetThink( &CWarpBall::Think1 );
 	pev->nextthink = gpGlobals->time + 0.1;
-	m_fBeamsCleared = FALSE;
+	m_fBeamsCleared = false;
 	m_flLastTime = gpGlobals->time;
-	m_fPlaying = TRUE;
-	m_fDamageApplied = FALSE;
+	m_fPlaying = true;
+	m_fDamageApplied = false;
 
 	if ( pev->spawnflags & 2 && m_flDamageDelay == 0.0 )
 	{
 		RadiusDamage( pev->origin, pev, pev, 300.0, 48.0, CLASS_NONE, DMG_SHOCK );
-		m_fDamageApplied = TRUE;
+		m_fDamageApplied = true;
 	}
 
 	SUB_UseTargets( this, USE_TOGGLE, 0 );
@@ -271,7 +271,7 @@ void CWarpBall::Think1()
 		if ( pev->spawnflags & 1 )
 			UTIL_Remove( this );
 
-		m_fPlaying = FALSE;
+		m_fPlaying = false;
 
 		if ( m_fWarpRefire )
 		{
@@ -288,7 +288,7 @@ void CWarpBall::Think1()
 				if ( gpGlobals->time - m_flWarpStart >= V_max( m_flDamageDelay + 0.2, 1.0 ) )
 				{
 					MakeMonster();
-					m_fMonsterCreated = TRUE;
+					m_fMonsterCreated = true;
 				}
 			}
 		}
@@ -342,7 +342,7 @@ void CWarpBall::MakeMonster()
 		}
 		else
 		{
-			m_fWarpRefire = TRUE;
+			m_fWarpRefire = true;
 			return;
 		}
 	}

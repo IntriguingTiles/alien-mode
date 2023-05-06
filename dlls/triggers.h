@@ -6,7 +6,7 @@
 class CMultiManager : public CBaseToggle
 {
 public:
-	void KeyValue( KeyValueData *pkvd ) override;
+	bool KeyValue( KeyValueData *pkvd ) override;
 	void Spawn() override;
 	virtual void ManagerThink();
 	void EXPORT ManagerUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
@@ -19,15 +19,15 @@ public:
 	void EXPORT ManagerReport();
 #endif
 
-	BOOL HasTarget( string_t targetname ) override;
+	bool HasTarget( string_t targetname ) override;
 
 	int ObjectCaps() override
 	{
 		return CBaseToggle::ObjectCaps() & ~FCAP_ACROSS_TRANSITION;
 	}
 
-	int Save( CSave &save ) override;
-	int Restore( CRestore &restore ) override;
+	bool Save( CSave &save ) override;
+	bool Restore( CRestore &restore ) override;
 
 	static TYPEDESCRIPTION m_SaveData[];
 
@@ -36,16 +36,14 @@ public:
 	float m_startTime;						  // Time we started firing
 	int m_iTargetName[MAX_MULTI_TARGETS];	  // list if indexes into global string array
 	float m_flTargetDelay[MAX_MULTI_TARGETS]; // delay (in seconds) from time of manager fire to target fire
-	inline BOOL IsClone()
-	{
-		return ( pev->spawnflags & SF_MULTIMAN_CLONE ) ? TRUE : FALSE;
-	}
-	inline BOOL ShouldClone()
-	{
-		if ( IsClone() )
-			return FALSE;
 
-		return ( pev->spawnflags & SF_MULTIMAN_THREAD ) ? TRUE : FALSE;
+	inline bool IsClone() { return (pev->spawnflags & SF_MULTIMAN_CLONE) != 0; }
+	inline bool ShouldClone()
+	{
+		if (IsClone())
+			return false;
+
+		return (pev->spawnflags & SF_MULTIMAN_THREAD) != 0;
 	}
 
 	virtual CMultiManager *Clone();

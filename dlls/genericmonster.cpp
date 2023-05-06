@@ -15,11 +15,11 @@
 //=========================================================
 // Generic Monster - purely for scripted sequence work.
 //=========================================================
-#include	"extdll.h"
-#include	"util.h"
-#include	"cbase.h"
-#include	"monsters.h"
-#include	"schedule.h"
+#include "extdll.h"
+#include "util.h"
+#include "cbase.h"
+#include "monsters.h"
+#include "schedule.h"
 #include "soundent.h"
 
 // For holograms, make them not solid so the player can walk through them
@@ -40,13 +40,13 @@ public:
 	void HandleAnimEvent( MonsterEvent_t *pEvent ) override;
 	int ISoundMask () override;
 
-	void KeyValue( KeyValueData *pkvd );
-	void PlayScriptedSentence( const char *pszSentence, float duration, float volume, float attenuation, BOOL bConcurrent, CBaseEntity *pListener );
+	bool KeyValue( KeyValueData *pkvd );
+	void PlayScriptedSentence( const char *pszSentence, float duration, float volume, float attenuation, bool bConcurrent, CBaseEntity *pListener );
 	void MonsterThink();
 	void IdleHeadTurn( Vector &vecFriend );
-	int TakeDamage( entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType );
-	int Save( CSave &save );
-	int Restore( CRestore &restore );
+	bool TakeDamage( entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType );
+	bool Save( CSave &save );
+	bool Restore( CRestore &restore );
 
 	static TYPEDESCRIPTION m_SaveData[];
 
@@ -78,10 +78,10 @@ IMPLEMENT_SAVERESTORE( CGenericMonster, CBaseMonster );
 LINK_ENTITY_TO_CLASS( monster_generic, CGenericMonster );
 
 //=========================================================
-// Classify - indicates this monster's place in the 
+// Classify - indicates this monster's place in the
 // relationship table.
 //=========================================================
-int	CGenericMonster :: Classify ()
+int CGenericMonster::Classify()
 {
 	if ( pev->spawnflags & 0x2000 )
 		return CLASS_NONE;
@@ -93,11 +93,11 @@ int	CGenericMonster :: Classify ()
 // SetYawSpeed - allows each sequence to have a different
 // turn rate associated with it.
 //=========================================================
-void CGenericMonster :: SetYawSpeed ()
+void CGenericMonster::SetYawSpeed()
 {
 	int ys;
 
-	switch ( m_Activity )
+	switch (m_Activity)
 	{
 	case ACT_IDLE:
 	default:
@@ -111,13 +111,13 @@ void CGenericMonster :: SetYawSpeed ()
 // HandleAnimEvent - catches the monster-specific messages
 // that occur when tagged animation frames are played.
 //=========================================================
-void CGenericMonster :: HandleAnimEvent( MonsterEvent_t *pEvent )
+void CGenericMonster::HandleAnimEvent(MonsterEvent_t* pEvent)
 {
-	switch( pEvent->event )
+	switch (pEvent->event)
 	{
 	case 0:
 	default:
-		CBaseMonster::HandleAnimEvent( pEvent );
+		CBaseMonster::HandleAnimEvent(pEvent);
 		break;
 	}
 }
@@ -125,28 +125,28 @@ void CGenericMonster :: HandleAnimEvent( MonsterEvent_t *pEvent )
 //=========================================================
 // ISoundMask - generic monster can't hear.
 //=========================================================
-int CGenericMonster :: ISoundMask ()
+int CGenericMonster::ISoundMask()
 {
-	return	bits_SOUND_NONE;
+	return bits_SOUND_NONE;
 }
 
 //=========================================================
 // Spawn
 //=========================================================
-void CGenericMonster :: Spawn()
+void CGenericMonster::Spawn()
 {
 	Precache();
 
-	SET_MODEL( ENT(pev), STRING(pev->model) );
+	SET_MODEL(ENT(pev), STRING(pev->model));
 
-/*
+	/*
 	if ( FStrEq( STRING(pev->model), "models/player.mdl" ) )
 		UTIL_SetSize(pev, VEC_HUMAN_HULL_MIN, VEC_HUMAN_HULL_MAX);
 	else
 		UTIL_SetSize(pev, VEC_HULL_MIN, VEC_HULL_MAX);
 */
 
-	if ( FStrEq( STRING(pev->model), "models/player.mdl" ) || FStrEq( STRING(pev->model), "models/holo.mdl" ) )
+	if (FStrEq(STRING(pev->model), "models/player.mdl") || FStrEq(STRING(pev->model), "models/holo.mdl"))
 		UTIL_SetSize(pev, VEC_HULL_MIN, VEC_HULL_MAX);
 	else
 		UTIL_SetSize(pev, VEC_HUMAN_HULL_MIN, VEC_HUMAN_HULL_MAX);
@@ -169,7 +169,7 @@ void CGenericMonster :: Spawn()
 
 	MonsterInit();
 
-	if ( pev->spawnflags & SF_GENERICMONSTER_NOTSOLID )
+	if ((pev->spawnflags & SF_GENERICMONSTER_NOTSOLID) != 0)
 	{
 		pev->solid = SOLID_NOT;
 		pev->takedamage = DAMAGE_NO;
@@ -184,31 +184,31 @@ void CGenericMonster :: Spawn()
 //=========================================================
 // Precache - precaches all resources this monster needs
 //=========================================================
-void CGenericMonster :: Precache()
+void CGenericMonster::Precache()
 {
-	PRECACHE_MODEL( (char *)STRING(pev->model) );
-}	
+	PRECACHE_MODEL((char*)STRING(pev->model));
+}
 
 //=========================================================
 // AI Schedules Specific to this monster
 //=========================================================
 
-void CGenericMonster::KeyValue( KeyValueData *pkvd )
+bool CGenericMonster::KeyValue( KeyValueData *pkvd )
 {
 	if ( FStrEq( pkvd->szKeyName, "target_trigger" ) )
 	{
 		m_iszTargetTrigger = ALLOC_STRING( pkvd->szValue );
-		pkvd->fHandled = TRUE;
+		return true;
 	}
 	else if ( FStrEq( pkvd->szKeyName, "no_target_trigger" ) )
 	{
 		m_iszNoTargetTrigger = ALLOC_STRING( pkvd->szValue );
-		pkvd->fHandled = TRUE;
+		return true;
 	}
 	else if ( FStrEq( pkvd->szKeyName, "trigger_hits" ) )
 	{
 		m_nTriggerHits = atoi( pkvd->szValue );
-		pkvd->fHandled = TRUE;
+		return true;
 	}
 	else
 	{
@@ -216,7 +216,7 @@ void CGenericMonster::KeyValue( KeyValueData *pkvd )
 	}
 }
 
-void CGenericMonster::PlayScriptedSentence( const char *pszSentence, float duration, float volume, float attenuation, BOOL bConcurrent, CBaseEntity *pListener )
+void CGenericMonster::PlayScriptedSentence( const char *pszSentence, float duration, float volume, float attenuation, bool bConcurrent, CBaseEntity *pListener )
 {
 	CBaseMonster::PlayScriptedSentence( pszSentence, duration, volume, attenuation, bConcurrent, pListener );
 
@@ -273,7 +273,7 @@ void CGenericMonster::IdleHeadTurn( Vector &vecFriend )
 	}
 }
 
-int CGenericMonster::TakeDamage( entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType )
+bool CGenericMonster::TakeDamage( entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType )
 {
 	if ( !FNullEnt( pevAttacker ) )
 	{

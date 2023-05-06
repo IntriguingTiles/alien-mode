@@ -10,12 +10,12 @@ class CEyeScanner : public CBaseToggle
 public:
 	void Spawn( void );
 	void Precache( void );
-	void KeyValue( KeyValueData *pkvd );
+	bool KeyValue( KeyValueData *pkvd );
 	void Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
 	EXPORT void UseThink( void );
 	int ObjectCaps( void ) { return FCAP_IMPULSE_USE; }
-	int Save( CSave &save );
-	int Restore( CRestore &restore );
+	bool Save( CSave &save );
+	bool Restore( CRestore &restore );
 
 	static TYPEDESCRIPTION m_SaveData[];
 
@@ -42,24 +42,25 @@ IMPLEMENT_SAVERESTORE( CEyeScanner, CBaseToggle );
 
 LINK_ENTITY_TO_CLASS( item_eyescanner, CEyeScanner );
 
-void CEyeScanner::KeyValue( KeyValueData *pkvd )
+bool CEyeScanner::KeyValue( KeyValueData *pkvd )
 {
 	if ( FStrEq( pkvd->szKeyName, "locked_target" ) )
 	{
 		m_iszLockedTarget = ALLOC_STRING( pkvd->szValue );
-		pkvd->fHandled = TRUE;
+		return true;
 	}
 	else if ( FStrEq( pkvd->szKeyName, "unlocked_target" ) )
 	{
 		m_iszUnlockedTarget = ALLOC_STRING( pkvd->szValue );
-		pkvd->fHandled = TRUE;
+		return true;
 	}
 	else if ( FStrEq( pkvd->szKeyName, "reset_delay" ) )
 	{
 		m_flResetDelay = atof( pkvd->szValue );
+		return true;
 	}
 
-	CBaseToggle::KeyValue( pkvd );
+	return CBaseToggle::KeyValue( pkvd );
 }
 
 void CEyeScanner::Spawn()

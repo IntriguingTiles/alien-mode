@@ -101,7 +101,7 @@ void CWeaponISlave::Precache()
 	}
 }
 
-int CWeaponISlave::GetItemInfo( ItemInfo *p )
+bool CWeaponISlave::GetItemInfo( ItemInfo *p )
 {
 	p->pszName = STRING( pev->classname );
 	p->pszAmmo1 = NULL;
@@ -113,10 +113,10 @@ int CWeaponISlave::GetItemInfo( ItemInfo *p )
 	p->iPosition = 2;
 	p->iId = WEAPON_ISLAVE;
 	p->iWeight = -1;
-	return 1;
+	return true;
 }
 
-BOOL CWeaponISlave::Deploy()
+bool CWeaponISlave::Deploy()
 {
 	m_pPlayer->m_iHideHUD |= HIDEHUD_HEALTH | HIDEHUD_FLASHLIGHT | HIDEHUD_WEAPONS;
 
@@ -150,7 +150,7 @@ void FindHullIntersection( const Vector &vecSrc, TraceResult &tr, const Vector &
 
 void CWeaponISlave::PrimaryAttack()
 {
-	int fDidHit = FALSE;
+	int fDidHit = false;
 
 	TraceResult tr;
 
@@ -244,7 +244,7 @@ void CWeaponISlave::PrimaryAttack()
 		// player "shoot" animation
 		m_pPlayer->SetAnimation( PLAYER_ATTACK1 );
 
-		fDidHit = TRUE;
+		fDidHit = true;
 		CBaseEntity *pEntity = CBaseEntity::Instance( tr.pHit );
 
 		ClearMultiDamage();
@@ -259,7 +259,7 @@ void CWeaponISlave::PrimaryAttack()
 		}
 
 		// play thwack, smack, or dong sound
-		int fHitWorld = TRUE;
+		int fHitWorld = true;
 
 		if ( pEntity )
 		{
@@ -279,7 +279,7 @@ void CWeaponISlave::PrimaryAttack()
 						break;
 				}
 
-				fHitWorld = FALSE;
+				fHitWorld = false;
 			}
 		}
 

@@ -10,7 +10,7 @@ class CItemGeneric : public CBaseAnimating
 public:
 	void Spawn( void );
 	void Precache( void );
-	void KeyValue( KeyValueData *pkvd );
+	bool KeyValue( KeyValueData *pkvd );
 	void Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
 	EXPORT void Think1( void );
 	EXPORT void Think2( void );
@@ -42,7 +42,7 @@ void CItemGeneric::Precache()
 	PRECACHE_MODEL( STRING( pev->model ) );
 }
 
-void CItemGeneric::KeyValue( KeyValueData *pkvd )
+bool CItemGeneric::KeyValue( KeyValueData *pkvd )
 {
 	if ( FStrEq( pkvd->szKeyName, "sequencename" ) )
 	{
@@ -54,21 +54,21 @@ void CItemGeneric::KeyValue( KeyValueData *pkvd )
 		{
 			m_iszSequenceName = ALLOC_STRING( pkvd->szValue );
 		}
-		pkvd->fHandled = TRUE;
+		return true;
 	}
 	else if ( FStrEq( pkvd->szKeyName, "skin" ) )
 	{
 		pev->skin = atof( pkvd->szValue );
-		pkvd->fHandled = TRUE;
+		return true;
 	}
 	else if ( FStrEq( pkvd->szKeyName, "body" ) )
 	{
 		pev->body = atoi( pkvd->szValue );
-		pkvd->fHandled = TRUE;
+		return true;
 	}
 	else
 	{
-		CBaseAnimating::KeyValue( pkvd );
+		return CBaseAnimating::KeyValue( pkvd );
 	}
 }
 

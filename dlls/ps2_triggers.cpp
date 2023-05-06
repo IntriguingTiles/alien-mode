@@ -19,12 +19,12 @@ public:
 	void EXPORT FreezeThink( void );
 	void Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
 
-	virtual int		Save( CSave &save );
-	virtual int		Restore( CRestore &restore );
+	virtual bool	Save( CSave &save );
+	virtual bool	Restore( CRestore &restore );
 
 	static	TYPEDESCRIPTION m_SaveData[];
 
-	BOOL m_bUnFrozen = true;
+	bool m_bUnFrozen = true;
 };
 
 LINK_ENTITY_TO_CLASS( trigger_playerfreeze, CTriggerPlayerFreeze );
@@ -36,21 +36,21 @@ TYPEDESCRIPTION CTriggerPlayerFreeze::m_SaveData[] =
 
 // because gearbox chose to modify Restore, we are forced to implement Save
 
-int CTriggerPlayerFreeze::Save( CSave &save )
+bool CTriggerPlayerFreeze::Save(CSave& save)
 {
 	if ( !CBaseDelay::Save(save) )
 		return 0;
 	return save.WriteFields( "CTriggerPlayerFreeze", this, m_SaveData, ARRAYSIZE(m_SaveData) );
 }
 
-int CTriggerPlayerFreeze::Restore( CRestore &restore )
+bool CTriggerPlayerFreeze::Restore(CRestore& restore)
 {
 	if ( !CBaseDelay::Restore(restore) )
 		return 0;
 
 	int ret = restore.ReadFields("CTriggerPlayerFreeze", this, m_SaveData, ARRAYSIZE(m_SaveData) );
 
-	if ( ret && m_bUnFrozen == FALSE )
+	if ( ret && m_bUnFrozen == false )
 	{
 		SetThink( &CTriggerPlayerFreeze::FreezeThink );
 		// gearbox moment:
@@ -64,7 +64,7 @@ int CTriggerPlayerFreeze::Restore( CRestore &restore )
 
 void CTriggerPlayerFreeze::Spawn()
 {
-	m_bUnFrozen = TRUE;
+	m_bUnFrozen = true;
 }
 
 void CTriggerPlayerFreeze::FreezeThink()
@@ -135,11 +135,11 @@ void CTriggerPlayerISlave::TriggerThink()
 class CTriggerRandom : public CBaseDelay
 {
 	void Spawn( void );
-	void KeyValue( KeyValueData *pkvd );
+	bool KeyValue( KeyValueData *pkvd );
 	void Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
 
-	virtual int Save( CSave &save );
-	virtual int Restore( CRestore &restore );
+	virtual bool Save( CSave &save );
+	virtual bool Restore( CRestore &restore );
 
 	static TYPEDESCRIPTION m_SaveData[];
 
@@ -166,7 +166,7 @@ void CTriggerRandom::Spawn()
 	m_dwUsedNumbers = -1;
 }
 
-void CTriggerRandom::KeyValue( KeyValueData *pkvd )
+bool CTriggerRandom::KeyValue( KeyValueData *pkvd )
 {
 	if ( FStrEq( pkvd->szKeyName, "triggerstate" ) )
 	{
@@ -182,12 +182,12 @@ void CTriggerRandom::KeyValue( KeyValueData *pkvd )
 				triggerType = 1;
 		}
 
-		pkvd->fHandled = TRUE;
+		return true;
 	}
 	else if ( FStrEq( pkvd->szKeyName, "randomrange" ) )
 	{
 		m_iRandomRange = atoi( pkvd->szValue );
-		pkvd->fHandled = TRUE;
+		return true;
 	}
 	else
 	{

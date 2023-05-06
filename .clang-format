@@ -1,36 +1,47 @@
----
-Language: Cpp
-BasedOnStyle: Microsoft
-Standard: Cpp11
+# Visual Studio generated .clang-format file
 
-AlignOperands: false
-
-IndentCaseLabels: 'true'
-IndentPPDirectives: BeforeHash
-IndentWidth: '4'
-
-FixNamespaceComments: 'true'
-NamespaceIndentation: All
-
-PointerAlignment: Right
-
-SortIncludes: 'false'
-
-TabWidth: '4'
-UseTab: Always
+# The style options in this file are a best effort attempt to replicate the
+# current IDE formatting configuration from Tools > Options.
 
 AccessModifierOffset: -4
-
-SpacesInAngles: 'false'
-SpacesInCStyleCastParentheses: 'false'
-SpacesInConditionalStatement: 'true'
-SpacesInContainerLiterals: 'false'
-SpacesInParentheses: 'true'
-SpacesInSquareBrackets: 'false'
-
-ReflowComments: 'false'
-
-PenaltyExcessCharacter: 0
----
-Language: Proto
-DisableFormat: true
+AlignAfterOpenBracket: DontAlign
+AllowShortBlocksOnASingleLine: true
+AllowShortCaseLabelsOnASingleLine: true
+AllowShortFunctionsOnASingleLine: All
+BasedOnStyle: LLVM
+BraceWrapping:
+  BeforeLambdaBody: true
+  AfterCaseLabel: true
+  AfterClass: true
+  AfterControlStatement: true
+  AfterEnum: true
+  AfterFunction: true
+  AfterNamespace: true
+  AfterStruct: true
+  AfterUnion: true
+  BeforeCatch: true
+  BeforeElse: true
+  IndentBraces: false
+  SplitEmptyFunction: true
+  SplitEmptyRecord: true
+BreakBeforeBraces: Custom
+ColumnLimit: 0
+Cpp11BracedListStyle: true
+FixNamespaceComments: false
+IndentCaseLabels: false
+IndentPPDirectives: None
+IndentWidth: 4
+MaxEmptyLinesToKeep: 10
+NamespaceIndentation: None
+PointerAlignment: Left
+SortIncludes: false
+SortUsingDeclarations: false
+SpaceAfterCStyleCast: false
+SpaceBeforeAssignmentOperators: true
+SpaceBeforeParens: ControlStatements
+SpaceInEmptyParentheses: false
+SpacesInCStyleCastParentheses: false
+SpacesInParentheses: false
+SpacesInSquareBrackets: false
+TabWidth: 4
+UseTab: true

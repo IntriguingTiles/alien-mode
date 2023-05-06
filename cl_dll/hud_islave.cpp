@@ -7,7 +7,7 @@
 
 DECLARE_MESSAGE( m_ISlave, ISlaveHud )
 
-int CHudISlave::Init()
+bool CHudISlave::Init()
 {
 	HOOK_MESSAGE( ISlaveHud );
 
@@ -32,7 +32,7 @@ void CHudISlave::Reset()
 	m_iHealth = gHUD.m_Health.m_iHealth;
 }
 
-int CHudISlave::VidInit()
+bool CHudISlave::VidInit()
 {
 	m_iFlags |= HUD_ACTIVE;
 	m_HUD_islave_center = gHUD.GetSpriteIndex( "islave_center" );
@@ -44,7 +44,7 @@ int CHudISlave::VidInit()
 	return 1;
 }
 
-int CHudISlave::MsgFunc_ISlaveHud( const char *pszName, int iSize, void *pbuf )
+bool CHudISlave::MsgFunc_ISlaveHud(const char* pszName, int iSize, void* pbuf)
 {
 	BEGIN_READ( pbuf, iSize );
 
@@ -53,7 +53,7 @@ int CHudISlave::MsgFunc_ISlaveHud( const char *pszName, int iSize, void *pbuf )
 	return 1;
 }
 
-int CHudISlave::Draw( float flTime )
+bool CHudISlave::Draw(float flTime)
 {
 	// hack to disable hud for c4a1 credits
 	if ( strstr( gEngfuncs.pfnGetLevelName(), "c4a1" ) )
@@ -72,7 +72,7 @@ int CHudISlave::Draw( float flTime )
 		y = ScreenHeight - gHUD.GetSpriteRect( m_HUD_islave_health ).bottom;
 
 	m_iHealth = gHUD.m_Health.m_iHealth;
-	wrect_t rect = gHUD.GetSpriteRect( m_HUD_islave_health );
+	Rect rect = gHUD.GetSpriteRect( m_HUD_islave_health );
 	int x = ScreenWidth / 2 - ( rect.right - rect.left ) / 2;
 
 	SPR_Set( gHUD.GetSprite( m_HUD_islave_health ), 48, 64, 8 );
@@ -96,7 +96,7 @@ int CHudISlave::Draw( float flTime )
 
 void CHudISlave::DrawCrosshair()
 {
-	wrect_t rect;
+	Rect rect;
 	int r = 96;
 	int g = 128;
 	int b = 16;

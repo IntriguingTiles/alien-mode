@@ -50,18 +50,18 @@ class CRechargeNew : public CBaseToggle
 public:
 	void Spawn( void );
 	void Precache( void );
-	void KeyValue( KeyValueData *pkvd );
+	bool KeyValue( KeyValueData *pkvd );
 	EXPORT void Think1( void );
 	EXPORT void Think2( void );
 	void Recharge( void );
 	void Off( void );
-	BOOL FindPlayer( void );
+	bool FindPlayer( void );
 	void DetermineYaw( void );
 	float VecToYaw( Vector vecDir );
 	void Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
 	int ObjectCaps() { return ( CBaseToggle::ObjectCaps() | FCAP_CONTINUOUS_USE ); }
-	int Save( CSave &save );
-	int Restore( CRestore &restore );
+	bool Save( CSave &save );
+	bool Restore( CRestore &restore );
 
 	static TYPEDESCRIPTION m_SaveData[];
 
@@ -111,7 +111,7 @@ IMPLEMENT_SAVERESTORE( CRechargeNew, CBaseToggle );
 
 LINK_ENTITY_TO_CLASS( item_recharge, CRechargeNew );
 
-void CRechargeNew::KeyValue( KeyValueData *pkvd )
+bool CRechargeNew::KeyValue( KeyValueData *pkvd )
 {
 		if (	FStrEq(pkvd->szKeyName, "style") ||
 				FStrEq(pkvd->szKeyName, "height") ||
@@ -119,12 +119,12 @@ void CRechargeNew::KeyValue( KeyValueData *pkvd )
 				FStrEq(pkvd->szKeyName, "value2") ||
 				FStrEq(pkvd->szKeyName, "value3"))
 	{
-		pkvd->fHandled = TRUE;
+		return true;
 	}
 	else if (FStrEq(pkvd->szKeyName, "dmdelay"))
 	{
 		m_flReactivate = atof(pkvd->szValue);
-		pkvd->fHandled = TRUE;
+		return true;
 	}
 	else
 		CBaseToggle::KeyValue( pkvd );
@@ -193,9 +193,9 @@ void CRechargeNew::Spawn()
 
 	m_hField = SpawnRechargeField( &pev->origin, &pev->angles );
 	m_flNextReactivate = 0.0;
-	m_fPlayerIsNear = FALSE;
+	m_fPlayerIsNear = false;
 	m_iIdleState = 0;
-	m_fLightsOn = FALSE;
+	m_fLightsOn = false;
 	pev->movetype = MOVETYPE_PUSH;
 	pev->skin = 0;
 	pev->sequence = LookupSequence( "rest" );
@@ -253,7 +253,7 @@ void CRechargeNew::Think2()
 		m_pBeam->SetStartAttachment( 4 );
 
 		if ( m_fLightsOn )
-			m_fLightsOn = FALSE;
+			m_fLightsOn = false;
 
 		field_0x124 = 0;
 	}
@@ -316,7 +316,7 @@ void CRechargeNew::Think2()
 				pev->sequence = LookupSequence( "deploy" );
 				pev->frame = 0.0;
 				ResetSequenceInfo();
-				m_fPlayerIsNear = TRUE;
+				m_fPlayerIsNear = true;
 				EMIT_SOUND( ENT( pev ), CHAN_ITEM, "items/suitchargeok1.wav", 1.0, ATTN_NORM );
 				m_flSoundTime = gpGlobals->time + 0.56;
 				m_pBeam->SetBrightness( 96.0 );
@@ -380,7 +380,7 @@ void CRechargeNew::Think2()
 		pev->sequence = LookupSequence( "retract_arm" );
 		pev->frame = 0.0;
 		ResetSequenceInfo();
-		m_fPlayerIsNear = FALSE;
+		m_fPlayerIsNear = false;
 		m_pBeam->SetBrightness( 0.0 );
 	}
 
@@ -436,7 +436,7 @@ void CRechargeNew::Off()
 	m_flOffTime = 0.0;
 }
 
-BOOL CRechargeNew::FindPlayer()
+bool CRechargeNew::FindPlayer()
 {
 	if ( gpGlobals->maxClients > 0 )
 	{
@@ -453,12 +453,12 @@ BOOL CRechargeNew::FindPlayer()
 						if ( FVisible( pPlayer->pev->origin ) )
 						{
 							m_hPlayer = pPlayer;
-							return TRUE;
+							return true;
 						}
 					}
 					else
 					{
-						return TRUE;
+						return true;
 					}
 				}
 			}
@@ -466,7 +466,7 @@ BOOL CRechargeNew::FindPlayer()
 	}
 
 	m_hPlayer = NULL;
-	return FALSE;
+	return false;
 }
 
 void CRechargeNew::DetermineYaw()
