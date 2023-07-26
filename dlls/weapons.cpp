@@ -414,7 +414,16 @@ void CBasePlayerItem::FallInit()
 	UTIL_SetSize(pev, Vector(0, 0, 0), Vector(0, 0, 0)); //pointsize until it lands on the ground.
 
 	SetTouch(&CBasePlayerItem::DefaultTouch);
-	SetThink(&CBasePlayerItem::FallThink);
+
+	if ((pev->spawnflags & 1U) != 0)
+	{
+		SetThink(&CBasePlayerItem::Materialize);
+		pev->movetype = MOVETYPE_NONE;
+	}
+	else
+	{
+		SetThink(&CBasePlayerItem::FallThink);
+	}
 
 	pev->nextthink = gpGlobals->time + 0.1;
 }

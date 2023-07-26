@@ -10,14 +10,14 @@
 class CWallHealthNewCanister : public CBaseAnimating
 {
 public:
-	void Spawn( void );
-	void Precache( void );
-	EXPORT void LiquidThink( void );
-	void SetLiquid( int liquid );
-	void SetSloshing( bool sloshing );
-	int ObjectCaps( void ) { return CBaseAnimating::ObjectCaps(); }
-	bool Save( CSave &save );
-	bool Restore( CRestore &restore );
+	void Spawn(void);
+	void Precache(void);
+	EXPORT void LiquidThink(void);
+	void SetLiquid(int liquid);
+	void SetSloshing(bool sloshing);
+	int ObjectCaps(void) { return CBaseAnimating::ObjectCaps(); }
+	bool Save(CSave& save);
+	bool Restore(CRestore& restore);
 
 	static TYPEDESCRIPTION m_SaveData[];
 
@@ -26,29 +26,29 @@ public:
 };
 
 TYPEDESCRIPTION CWallHealthNewCanister::m_SaveData[] =
-{
-	DEFINE_FIELD( CWallHealthNewCanister, m_fDraining, FIELD_BOOLEAN ),
-	DEFINE_FIELD( CWallHealthNewCanister, m_fSettling, FIELD_BOOLEAN ),
+	{
+		DEFINE_FIELD(CWallHealthNewCanister, m_fDraining, FIELD_BOOLEAN),
+		DEFINE_FIELD(CWallHealthNewCanister, m_fSettling, FIELD_BOOLEAN),
 };
 
-IMPLEMENT_SAVERESTORE( CWallHealthNewCanister, CBaseAnimating );
+IMPLEMENT_SAVERESTORE(CWallHealthNewCanister, CBaseAnimating);
 
-LINK_ENTITY_TO_CLASS( item_healthchargercan, CWallHealthNewCanister );
+LINK_ENTITY_TO_CLASS(item_healthchargercan, CWallHealthNewCanister);
 
 void CWallHealthNewCanister::Spawn()
 {
 	Precache();
 	pev->solid = SOLID_NOT;
-	SET_MODEL( ENT( pev ), "models/health_charger_both.mdl" );
+	SET_MODEL(ENT(pev), "models/health_charger_both.mdl");
 	pev->movetype = MOVETYPE_NONE;
-	UTIL_SetOrigin( pev, pev->origin );
+	UTIL_SetOrigin(pev, pev->origin);
 	pev->rendermode = kRenderTransAlpha;
 	pev->renderamt = 150.0;
-	pev->sequence = LookupSequence( "still" );
+	pev->sequence = LookupSequence("still");
 	pev->frame = 0.0;
 	ResetSequenceInfo();
-	SetBoneController( 0, 0.0 );
-	SetThink( &CWallHealthNewCanister::LiquidThink );
+	SetBoneController(0, 0.0);
+	SetThink(&CWallHealthNewCanister::LiquidThink);
 	pev->nextthink = gpGlobals->time + 0.1;
 	m_fSettling = false;
 	m_fDraining = false;
@@ -56,19 +56,19 @@ void CWallHealthNewCanister::Spawn()
 
 void CWallHealthNewCanister::Precache()
 {
-	PRECACHE_MODEL( "models/health_charger_both.mdl" );
+	PRECACHE_MODEL("models/health_charger_both.mdl");
 }
 
 void CWallHealthNewCanister::LiquidThink()
 {
-	DispatchAnimEvents( 0.1 );
-	StudioFrameAdvance( 0.0 );
+	DispatchAnimEvents(0.1);
+	StudioFrameAdvance(0.0);
 
-	if ( m_fSequenceFinished && !m_fSequenceLoops )
+	if (m_fSequenceFinished && !m_fSequenceLoops)
 	{
-		if ( m_fSettling )
+		if (m_fSettling)
 		{
-			pev->sequence = LookupSequence( "still" );
+			pev->sequence = LookupSequence("still");
 			m_fSettling = false;
 		}
 
@@ -79,66 +79,66 @@ void CWallHealthNewCanister::LiquidThink()
 	pev->nextthink = gpGlobals->time + 0.1;
 }
 
-void CWallHealthNewCanister::SetLiquid( int liquid )
+void CWallHealthNewCanister::SetLiquid(int liquid)
 {
-	SetBoneController( 0, (float)liquid * 0.1 + -11.0 );
+	SetBoneController(0, (float)liquid * 0.1 + -11.0);
 }
 
-void CWallHealthNewCanister::SetSloshing( bool sloshing )
+void CWallHealthNewCanister::SetSloshing(bool sloshing)
 {
-	if ( sloshing )
+	if (sloshing)
 	{
-		if ( !m_fDraining )
+		if (!m_fDraining)
 		{
 			m_fSettling = false;
 			m_fDraining = true;
-			pev->sequence = LookupSequence( "slosh" );
+			pev->sequence = LookupSequence("slosh");
 			pev->frame = 0.0;
 			ResetSequenceInfo();
 		}
 	}
 	else
 	{
-		if ( m_fDraining )
+		if (m_fDraining)
 		{
 			m_fDraining = false;
 			m_fSettling = true;
-			pev->sequence = LookupSequence( "to_rest" );
+			pev->sequence = LookupSequence("to_rest");
 			pev->frame = 0.0;
 			ResetSequenceInfo();
 		}
 	}
 }
 
-CWallHealthNewCanister *SpawnHealthCanister( Vector *vecOrigin, Vector *vecAngles )
+CWallHealthNewCanister* SpawnHealthCanister(Vector* vecOrigin, Vector* vecAngles)
 {
-	CWallHealthNewCanister *pCanister = GetClassPtr( (CWallHealthNewCanister *)NULL );
-	
-	pCanister->pev->classname = MAKE_STRING( "item_healthchargercan" );
+	CWallHealthNewCanister* pCanister = GetClassPtr((CWallHealthNewCanister*)NULL);
+
+	pCanister->pev->classname = MAKE_STRING("item_healthchargercan");
 	pCanister->pev->origin = *vecOrigin;
 	pCanister->pev->angles = *vecAngles;
 	pCanister->Spawn();
-	
+
 	return pCanister;
 }
 
 class CWallHealthNew : public CBaseToggle
 {
 public:
-	void Spawn( void );
-	void Precache( void );
-	bool KeyValue( KeyValueData *pkvd );
-	EXPORT void Think1( void );
-	EXPORT void Think2( void );
-	void Recharge( void );
-	void Off( void );
-	bool FindPlayer( void );
-	void DetermineYaw( void );
-	float VecToYaw( Vector vecDir );
-	void Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
-	int ObjectCaps() { return ( CBaseToggle::ObjectCaps() | FCAP_CONTINUOUS_USE ); }
-	bool Save( CSave &save );
-	bool Restore( CRestore &restore );
+	void Spawn(void);
+	void Precache(void);
+	bool KeyValue(KeyValueData* pkvd);
+	EXPORT void Think1(void);
+	EXPORT void Think2(void);
+	void Recharge(void);
+	void Off(void);
+	bool FindPlayer(void);
+	void DetermineYaw(void);
+	float VecToYaw(Vector vecDir);
+	void Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, float value);
+	int ObjectCaps() { return (CBaseToggle::ObjectCaps() | FCAP_CONTINUOUS_USE); }
+	bool Save(CSave& save);
+	bool Restore(CRestore& restore);
 
 	static TYPEDESCRIPTION m_SaveData[];
 
@@ -163,35 +163,35 @@ public:
 };
 
 TYPEDESCRIPTION CWallHealthNew::m_SaveData[] = {
-	DEFINE_FIELD( CWallHealthNew, m_flNextCharge, FIELD_TIME ),
-	DEFINE_FIELD( CWallHealthNew, m_flReactivate, FIELD_FLOAT ),
-	DEFINE_FIELD( CWallHealthNew, m_iJuice, FIELD_INTEGER ),
-	DEFINE_FIELD( CWallHealthNew, m_iOn, FIELD_INTEGER ),
-	DEFINE_FIELD( CWallHealthNew, m_flSoundTime, FIELD_TIME ),
-	DEFINE_FIELD( CWallHealthNew, m_flNextReactivate, FIELD_TIME ),
-	DEFINE_FIELD( CWallHealthNew, m_hCanister, FIELD_EHANDLE ),
-	DEFINE_FIELD( CWallHealthNew, m_hPlayer, FIELD_EHANDLE ),
-	DEFINE_FIELD( CWallHealthNew, m_fPlayerIsNear, FIELD_BOOLEAN ),
-	DEFINE_FIELD( CWallHealthNew, m_iIdleState, FIELD_INTEGER ),
-	DEFINE_FIELD( CWallHealthNew, m_flIdealArmYaw, FIELD_FLOAT ),
-	DEFINE_FIELD( CWallHealthNew, m_flIdealEyeYaw, FIELD_FLOAT ),
-	DEFINE_FIELD( CWallHealthNew, m_flCurrentArmYaw, FIELD_FLOAT ),
-	DEFINE_FIELD( CWallHealthNew, m_flCurrentEyeYaw, FIELD_FLOAT ),
-	DEFINE_FIELD( CWallHealthNew, m_flOffTime, FIELD_TIME ),
-	DEFINE_FIELD( CWallHealthNew, m_fLightsOn, FIELD_BOOLEAN ),
+	DEFINE_FIELD(CWallHealthNew, m_flNextCharge, FIELD_TIME),
+	DEFINE_FIELD(CWallHealthNew, m_flReactivate, FIELD_FLOAT),
+	DEFINE_FIELD(CWallHealthNew, m_iJuice, FIELD_INTEGER),
+	DEFINE_FIELD(CWallHealthNew, m_iOn, FIELD_INTEGER),
+	DEFINE_FIELD(CWallHealthNew, m_flSoundTime, FIELD_TIME),
+	DEFINE_FIELD(CWallHealthNew, m_flNextReactivate, FIELD_TIME),
+	DEFINE_FIELD(CWallHealthNew, m_hCanister, FIELD_EHANDLE),
+	DEFINE_FIELD(CWallHealthNew, m_hPlayer, FIELD_EHANDLE),
+	DEFINE_FIELD(CWallHealthNew, m_fPlayerIsNear, FIELD_BOOLEAN),
+	DEFINE_FIELD(CWallHealthNew, m_iIdleState, FIELD_INTEGER),
+	DEFINE_FIELD(CWallHealthNew, m_flIdealArmYaw, FIELD_FLOAT),
+	DEFINE_FIELD(CWallHealthNew, m_flIdealEyeYaw, FIELD_FLOAT),
+	DEFINE_FIELD(CWallHealthNew, m_flCurrentArmYaw, FIELD_FLOAT),
+	DEFINE_FIELD(CWallHealthNew, m_flCurrentEyeYaw, FIELD_FLOAT),
+	DEFINE_FIELD(CWallHealthNew, m_flOffTime, FIELD_TIME),
+	DEFINE_FIELD(CWallHealthNew, m_fLightsOn, FIELD_BOOLEAN),
 };
 
-IMPLEMENT_SAVERESTORE( CWallHealthNew, CBaseToggle );
+IMPLEMENT_SAVERESTORE(CWallHealthNew, CBaseToggle);
 
-LINK_ENTITY_TO_CLASS( item_healthcharger, CWallHealthNew );
+LINK_ENTITY_TO_CLASS(item_healthcharger, CWallHealthNew);
 
-bool CWallHealthNew::KeyValue( KeyValueData *pkvd )
+bool CWallHealthNew::KeyValue(KeyValueData* pkvd)
 {
-		if (	FStrEq(pkvd->szKeyName, "style") ||
-				FStrEq(pkvd->szKeyName, "height") ||
-				FStrEq(pkvd->szKeyName, "value1") ||
-				FStrEq(pkvd->szKeyName, "value2") ||
-				FStrEq(pkvd->szKeyName, "value3"))
+	if (FStrEq(pkvd->szKeyName, "style") ||
+		FStrEq(pkvd->szKeyName, "height") ||
+		FStrEq(pkvd->szKeyName, "value1") ||
+		FStrEq(pkvd->szKeyName, "value2") ||
+		FStrEq(pkvd->szKeyName, "value3"))
 	{
 		return true;
 	}
@@ -201,48 +201,48 @@ bool CWallHealthNew::KeyValue( KeyValueData *pkvd )
 		return true;
 	}
 	else
-		CBaseToggle::KeyValue( pkvd );
+		return CBaseToggle::KeyValue(pkvd);
 }
 
 void CWallHealthNew::Spawn()
 {
 	Precache();
 	pev->solid = SOLID_BBOX;
-	SET_MODEL( ENT( pev ), "models/health_charger_body.mdl" );
+	SET_MODEL(ENT(pev), "models/health_charger_body.mdl");
 
-	if ( pev->angles.y < 0.0 )
+	if (pev->angles.y < 0.0)
 	{
 		pev->angles.y += 360.0;
 	}
 
-	if ( pev->angles.y == 0.0 || pev->angles.y == 180.0 )
+	if (pev->angles.y == 0.0 || pev->angles.y == 180.0)
 	{
-		UTIL_SetSize( pev, Vector( -16.0, -18.0, 0.0 ), Vector( 16.0, 18.0, 32.0 ) );
+		UTIL_SetSize(pev, Vector(-16.0, -18.0, 0.0), Vector(16.0, 18.0, 32.0));
 	}
 	else
 	{
-		UTIL_SetSize( pev, Vector( -18.0, -16.0, 0.0 ), Vector( 18.0, 16.0, 32.0 ) );
+		UTIL_SetSize(pev, Vector(-18.0, -16.0, 0.0), Vector(18.0, 16.0, 32.0));
 	}
 
 	// wtf is this
-	if ( pev->angles.y > 45.0 || pev->angles.y < 0.0 )
+	if (pev->angles.y > 45.0 || pev->angles.y < 0.0)
 	{
-		if ( pev->angles.y > 315.0 && pev->angles.y <= 360.0 )
+		if (pev->angles.y > 315.0 && pev->angles.y <= 360.0)
 		{
 			pev->view_ofs.x = -8.0;
 			pev->view_ofs.y = 4.0;
 			pev->view_ofs.z = 32.0;
 		}
-		else if ( pev->angles.y <= 135.0 )
+		else if (pev->angles.y <= 135.0)
 		{
-			if ( pev->angles.y > 45.0 )
+			if (pev->angles.y > 45.0)
 			{
 				pev->view_ofs.x = -4.0;
 				pev->view_ofs.y = 8.0;
 				pev->view_ofs.z = 32.0;
 			}
 		}
-		else if ( pev->angles.y <= 255.0 )
+		else if (pev->angles.y <= 255.0)
 		{
 			if (pev->angles.y > 135.0)
 			{
@@ -251,7 +251,7 @@ void CWallHealthNew::Spawn()
 				pev->view_ofs.z = 32.0;
 			}
 		}
-		else if ( pev->angles.y > 315.0 && pev->angles.y <= 255.0 )
+		else if (pev->angles.y > 315.0 && pev->angles.y <= 255.0)
 		{
 			pev->view_ofs.x = 4.0;
 			pev->view_ofs.y = -8.0;
@@ -265,64 +265,65 @@ void CWallHealthNew::Spawn()
 		pev->view_ofs.z = 32.0;
 	}
 
-	m_hCanister = SpawnHealthCanister( &pev->origin, &pev->angles );
+	m_hCanister = SpawnHealthCanister(&pev->origin, &pev->angles);
 	m_flNextReactivate = 0.0;
 	m_fPlayerIsNear = false;
 	m_iIdleState = 0;
 	m_fLightsOn = false;
 	pev->movetype = MOVETYPE_PUSH;
 	pev->skin = 0;
-	pev->sequence = LookupSequence( "still" );
+	pev->sequence = LookupSequence("still");
 	pev->frame = 0.0;
 	ResetSequenceInfo();
-	SetBoneController( 0, 0.0 );
-	SetBoneController( 1, 0.0 );
+	SetBoneController(0, 0.0);
+	SetBoneController(1, 0.0);
 	m_flOffTime = 0.0;
 	m_flCurrentArmYaw = 0.0;
 	m_flIdealArmYaw = 0.0;
 	m_flCurrentEyeYaw = 0.0;
 	m_flIdealEyeYaw = 0.0;
-	UTIL_SetOrigin( pev, pev->origin );
+	UTIL_SetOrigin(pev, pev->origin);
 	m_iJuice = gSkillData.healthchargerCapacity;
-	SetThink( &CWallHealthNew::Think1 );
+	SetThink(&CWallHealthNew::Think1);
 	pev->nextthink = pev->ltime + 0.5;
 }
 
 void CWallHealthNew::Precache()
 {
-	PRECACHE_MODEL( "models/health_charger_body.mdl" );
-	UTIL_PrecacheOther( "item_healthchargercan" );
-	PRECACHE_SOUND( "items/medshot4.wav" );
-	PRECACHE_SOUND( "items/medshotno1.wav" );
-	PRECACHE_SOUND( "items/medcharge4.wav" );
+	PRECACHE_MODEL("models/health_charger_body.mdl");
+	UTIL_PrecacheOther("item_healthchargercan");
+	PRECACHE_SOUND("items/medshot4.wav");
+	PRECACHE_SOUND("items/medshotno1.wav");
+	PRECACHE_SOUND("items/medcharge4.wav");
 }
 
 void CWallHealthNew::Think1()
 {
 	// why
-	SetThink( &CWallHealthNew::Think2 );
+	SetThink(&CWallHealthNew::Think2);
 	pev->nextthink = pev->ltime + 0.1;
 }
 
 void CWallHealthNew::Think2()
 {
-	if ( field_0x118 != 0 && m_fLightsOn )
+	if (field_0x118 != 0 && m_fLightsOn)
 	{
 		m_fLightsOn = false;
 		field_0x118 = 0;
 	}
 
-	DispatchAnimEvents( 0.1 );
-	StudioFrameAdvance( 0.0 );
+	DispatchAnimEvents(0.1);
+	StudioFrameAdvance(0.0);
 
-	if ( m_fSequenceFinished )
+	if (m_fSequenceFinished)
 	{
-		if ( !m_fPlayerIsNear )
+		if (!m_fPlayerIsNear)
 		{
-			if ( m_iIdleState != 1 ) {
-				if ( !m_iOn )
+			if (m_iIdleState != 1)
+			{
+				if (!m_iOn)
 				{
-					pev->sequence = LookupSequence( "still" );
+					pev->sequence = LookupSequence("still");
 					pev->frame = 0.0;
 					ResetSequenceInfo();
 					m_iIdleState = 1;
@@ -331,17 +332,17 @@ void CWallHealthNew::Think2()
 		}
 		else
 		{
-			if ( m_iIdleState == 2 && m_iOn )
+			if (m_iIdleState == 2 && m_iOn)
 			{
-				pev->sequence = LookupSequence( "shot_idle" );
+				pev->sequence = LookupSequence("shot_idle");
 				pev->frame = 0.0;
 				ResetSequenceInfo();
 			}
 			else
 			{
-				if ( m_iIdleState != 2 && !m_iOn )
+				if (m_iIdleState != 2 && !m_iOn)
 				{
-					pev->sequence = LookupSequence( "prep_shot" );
+					pev->sequence = LookupSequence("prep_shot");
 					pev->frame = 0.0;
 					ResetSequenceInfo();
 					m_iIdleState = 2;
@@ -350,62 +351,62 @@ void CWallHealthNew::Think2()
 		}
 	}
 
-	if ( m_flNextReactivate > 0.0 && m_flNextReactivate < gpGlobals->time )
+	if (m_flNextReactivate > 0.0 && m_flNextReactivate < gpGlobals->time)
 	{
 		Recharge();
 	}
 
-	if ( m_flOffTime > 0.0 && m_flOffTime < gpGlobals->time )
+	if (m_flOffTime > 0.0 && m_flOffTime < gpGlobals->time)
 	{
 		Off();
 	}
 
-	if ( m_iJuice >= 1 )
+	if (m_iJuice >= 1)
 	{
-		if ( FindPlayer() )
+		if (FindPlayer())
 		{
-			if ( !m_fPlayerIsNear )
+			if (!m_fPlayerIsNear)
 			{
-				pev->sequence = LookupSequence( "deploy" );
+				pev->sequence = LookupSequence("deploy");
 				pev->frame = 0.0;
 				ResetSequenceInfo();
 				m_fPlayerIsNear = true;
-				EMIT_SOUND( ENT( pev ), CHAN_ITEM, "items/medshot4.wav", 1.0, ATTN_NORM );
+				EMIT_SOUND(ENT(pev), CHAN_ITEM, "items/medshot4.wav", 1.0, ATTN_NORM);
 				m_flSoundTime = gpGlobals->time + 0.56;
 			}
 
 			DetermineYaw();
 
-			if ( m_flIdealArmYaw != m_flCurrentArmYaw )
+			if (m_flIdealArmYaw != m_flCurrentArmYaw)
 			{
 				// gearbox moment: calculating the maximum distance that the yaw should change by and then just discarding it
-				if ( m_flIdealArmYaw < m_flCurrentArmYaw )
+				if (m_flIdealArmYaw < m_flCurrentArmYaw)
 				{
-					m_flCurrentArmYaw -= V_min( m_flCurrentArmYaw - m_flIdealArmYaw, 5.0 );
+					m_flCurrentArmYaw -= V_min(m_flCurrentArmYaw - m_flIdealArmYaw, 5.0);
 				}
 				else
 				{
-					m_flCurrentArmYaw += V_min( m_flIdealArmYaw - m_flCurrentArmYaw, 5.0 );
+					m_flCurrentArmYaw += V_min(m_flIdealArmYaw - m_flCurrentArmYaw, 5.0);
 				}
 
 				m_flCurrentArmYaw = m_flIdealArmYaw;
-				SetBoneController( 0, m_flIdealArmYaw );
+				SetBoneController(0, m_flIdealArmYaw);
 			}
 
-			if ( m_flIdealEyeYaw != m_flCurrentEyeYaw )
+			if (m_flIdealEyeYaw != m_flCurrentEyeYaw)
 			{
 				// ditto
-				if ( m_flIdealEyeYaw < m_flCurrentEyeYaw )
+				if (m_flIdealEyeYaw < m_flCurrentEyeYaw)
 				{
-					m_flCurrentEyeYaw -= V_min( m_flCurrentEyeYaw - m_flIdealEyeYaw, 5.0 );
+					m_flCurrentEyeYaw -= V_min(m_flCurrentEyeYaw - m_flIdealEyeYaw, 5.0);
 				}
 				else
 				{
-					m_flCurrentEyeYaw += V_min( m_flIdealEyeYaw - m_flCurrentEyeYaw, 5.0 );
+					m_flCurrentEyeYaw += V_min(m_flIdealEyeYaw - m_flCurrentEyeYaw, 5.0);
 				}
 
 				m_flCurrentEyeYaw = m_flIdealEyeYaw;
-				SetBoneController( 1, m_flIdealEyeYaw );
+				SetBoneController(1, m_flIdealEyeYaw);
 			}
 
 			// NOT ACCURATE
@@ -414,11 +415,11 @@ void CWallHealthNew::Think2()
 		}
 	}
 
-	if ( m_fPlayerIsNear )
+	if (m_fPlayerIsNear)
 	{
 		m_flIdealArmYaw = 0.0;
-		SetBoneController( 0, m_flIdealArmYaw );
-		pev->sequence = LookupSequence( "retract_arm" );
+		SetBoneController(0, m_flIdealArmYaw);
+		pev->sequence = LookupSequence("retract_arm");
 		pev->frame = 0.0;
 		ResetSequenceInfo();
 		m_fPlayerIsNear = false;
@@ -429,29 +430,30 @@ void CWallHealthNew::Think2()
 
 void CWallHealthNew::Recharge()
 {
-	EMIT_SOUND( ENT( pev ), CHAN_ITEM, "items/medshot4.wav", 1.0, ATTN_NORM );
+	EMIT_SOUND(ENT(pev), CHAN_ITEM, "items/medshot4.wav", 1.0, ATTN_NORM);
 	m_flNextReactivate = 0.0;
 	m_iJuice = gSkillData.healthchargerCapacity;
-	( (CWallHealthNewCanister *)( (CBaseEntity *)m_hCanister ) )->SetLiquid( 100 );
+	((CWallHealthNewCanister*)((CBaseEntity*)m_hCanister))->SetLiquid(100);
 }
 
 void CWallHealthNew::Off()
 {
-	if ( m_iOn >= 2 ) {
-		STOP_SOUND( ENT( pev ), CHAN_STATIC, "items/medcharge4.wav" );
+	if (m_iOn >= 2)
+	{
+		STOP_SOUND(ENT(pev), CHAN_STATIC, "items/medcharge4.wav");
 	}
 
 	m_iOn = 0;
-	pev->sequence = LookupSequence( "retract_shot" );
+	pev->sequence = LookupSequence("retract_shot");
 	pev->frame = 0.0;
 	ResetSequenceInfo();
-	( (CWallHealthNewCanister *)( (CBaseEntity *)m_hCanister ) )->SetSloshing( false );
+	((CWallHealthNewCanister*)((CBaseEntity*)m_hCanister))->SetSloshing(false);
 
-	if ( m_iJuice == 0 )
+	if (m_iJuice == 0)
 	{
 		m_flReactivate = g_pGameRules->FlHealthChargerRechargeTime();
 
-		if ( m_flReactivate > 0.0 )
+		if (m_flReactivate > 0.0)
 		{
 			m_flNextReactivate = gpGlobals->time + m_flReactivate;
 		}
@@ -462,19 +464,19 @@ void CWallHealthNew::Off()
 
 bool CWallHealthNew::FindPlayer()
 {
-	if ( gpGlobals->maxClients > 0 )
+	if (gpGlobals->maxClients > 0)
 	{
-		for ( int i = 1; i <= gpGlobals->maxClients; i++ )
+		for (int i = 1; i <= gpGlobals->maxClients; i++)
 		{
-			CBaseEntity *pPlayer = UTIL_PlayerByIndex( i );
+			CBaseEntity* pPlayer = UTIL_PlayerByIndex(i);
 
-			if ( pPlayer )
+			if (pPlayer)
 			{
-				if ( ( pPlayer->pev->origin - pev->origin ).Length() < 96.0 )
+				if ((pPlayer->pev->origin - pev->origin).Length() < 96.0)
 				{
-					if ( m_hPlayer == NULL )
+					if (m_hPlayer == NULL)
 					{
-						if ( FVisible( pPlayer->pev->origin ) )
+						if (FVisible(pPlayer->pev->origin))
 						{
 							m_hPlayer = pPlayer;
 							return true;
@@ -499,24 +501,24 @@ void CWallHealthNew::DetermineYaw()
 	float yaw;
 
 	// arm yaw
-	if ( pev->angles.y > 45.0 || pev->angles.y < 0.0 )
+	if (pev->angles.y > 45.0 || pev->angles.y < 0.0)
 	{
-		if ( pev->angles.y > 315.0 && pev->angles.y <= 360.0 )
+		if (pev->angles.y > 315.0 && pev->angles.y <= 360.0)
 		{
 			vec.x = pev->origin.x + 4.0;
 			vec.y = pev->origin.y + 8.0;
 		}
-		else if ( pev->angles.y <= 135.0 && pev->angles.y > 45.0 )
+		else if (pev->angles.y <= 135.0 && pev->angles.y > 45.0)
 		{
 			vec.x = pev->origin.x + -8.0;
 			vec.y = pev->origin.y + -4.0;
 		}
-		else if ( pev->angles.y <= 225.0 && pev->angles.y > 135.0 )
+		else if (pev->angles.y <= 225.0 && pev->angles.y > 135.0)
 		{
 			vec.x = pev->origin.x + -4.0;
 			vec.y = pev->origin.y + -8.0;
 		}
-		else if ( pev->angles.y <= 315.0 && pev->angles.y > 225.0 )
+		else if (pev->angles.y <= 315.0 && pev->angles.y > 225.0)
 		{
 			vec.x = pev->origin.x + 8.0;
 			vec.y = pev->origin.y + 4.0;
@@ -530,21 +532,21 @@ void CWallHealthNew::DetermineYaw()
 
 	vec.z = pev->origin.z + 16.0;
 
-	CBaseEntity *pPlayer = m_hPlayer;
-	yaw = VecToYaw( pPlayer->pev->origin - vec );
-	m_flIdealArmYaw = UTIL_AngleDistance( yaw, pev->angles.y );
+	CBaseEntity* pPlayer = m_hPlayer;
+	yaw = VecToYaw(pPlayer->pev->origin - vec);
+	m_flIdealArmYaw = UTIL_AngleDistance(yaw, pev->angles.y);
 
 	// eye yaw
-	if ( pev->angles.y > 45.0 || pev->angles.y < 0.0 )
+	if (pev->angles.y > 45.0 || pev->angles.y < 0.0)
 	{
-		if ( pev->angles.y > 315.0 && pev->angles.y <= 360.0 )
+		if (pev->angles.y > 315.0 && pev->angles.y <= 360.0)
 		{
 			vec.x = pev->origin.x + 4.0;
 			vec.y = pev->origin.y + -8.0;
 		}
-		else if ( pev->angles.y > 135.0 || pev->angles.y <= 45.0 )
+		else if (pev->angles.y > 135.0 || pev->angles.y <= 45.0)
 		{
-			if ( pev->angles.y > 225.0 || pev->angles.y <= 135.0 )
+			if (pev->angles.y > 225.0 || pev->angles.y <= 135.0)
 			{
 				vec.x = pev->origin.x + -8.0;
 				vec.y = pev->origin.y + 4.0;
@@ -568,75 +570,75 @@ void CWallHealthNew::DetermineYaw()
 	}
 
 	vec.z = pev->origin.z + 32.0;
-	
-	yaw = VecToYaw( pPlayer->pev->origin - vec );
-	m_flIdealEyeYaw = UTIL_AngleDistance( yaw, pev->angles.y );
+
+	yaw = VecToYaw(pPlayer->pev->origin - vec);
+	m_flIdealEyeYaw = UTIL_AngleDistance(yaw, pev->angles.y);
 }
 
-float CWallHealthNew::VecToYaw( Vector vecDir )
+float CWallHealthNew::VecToYaw(Vector vecDir)
 {
-	if ( vecDir.x == 0 && vecDir.y == 0 && vecDir.z == 0 )
+	if (vecDir.x == 0 && vecDir.y == 0 && vecDir.z == 0)
 		return pev->angles.y;
 
-	return UTIL_VecToYaw( vecDir );
+	return UTIL_VecToYaw(vecDir);
 }
 
-void CWallHealthNew::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CWallHealthNew::Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, float value)
 {
-	CWallHealthNewCanister *pCanister = (CWallHealthNewCanister*)(CBaseEntity*)m_hCanister;
+	CWallHealthNewCanister* pCanister = (CWallHealthNewCanister*)(CBaseEntity*)m_hCanister;
 
-	if ( !pActivator )
+	if (!pActivator)
 		return;
 
-	if ( !pActivator->IsPlayer() )
+	if (!pActivator->IsPlayer())
 		return;
 
-	if ( ( pActivator->pev->origin - pev->origin ).Length2D() > 48.0 )
+	if ((pActivator->pev->origin - pev->origin).Length2D() > 48.0)
 		return;
 
-	if ( m_iJuice <= 0 || ( !( pActivator->pev->weapons & ( 1 << WEAPON_SUIT ) ) ) )
+	if (m_iJuice <= 0 || (!(pActivator->pev->weapons & (1 << WEAPON_SUIT))))
 	{
-		if ( m_flSoundTime <= gpGlobals->time )
+		if (m_flSoundTime <= gpGlobals->time)
 		{
 			m_flSoundTime = gpGlobals->time + 0.62;
-			EMIT_SOUND( ENT( pev ), CHAN_ITEM, "items/medshotno1.wav", 1.0, ATTN_NORM );
+			EMIT_SOUND(ENT(pev), CHAN_ITEM, "items/medshotno1.wav", 1.0, ATTN_NORM);
 		}
 		return;
 	}
 
 	m_flOffTime = gpGlobals->time + 0.25;
 
-	if ( m_flNextCharge >= gpGlobals->time )
+	if (m_flNextCharge >= gpGlobals->time)
 		return;
 
-	if ( !m_iOn )
+	if (!m_iOn)
 	{
 		m_iOn++;
-		EMIT_SOUND( ENT( pev ), CHAN_ITEM, "items/medshot4.wav", 1.0, ATTN_NORM );
+		EMIT_SOUND(ENT(pev), CHAN_ITEM, "items/medshot4.wav", 1.0, ATTN_NORM);
 		m_flSoundTime = gpGlobals->time + 0.56;
-		pCanister->SetSloshing( true );
-		pev->sequence = LookupSequence( "give_shot" );
+		pCanister->SetSloshing(true);
+		pev->sequence = LookupSequence("give_shot");
 		pev->frame = 0.0;
 		ResetSequenceInfo();
 	}
 
-	if ( m_iOn == 1 && m_flSoundTime <= gpGlobals->time )
+	if (m_iOn == 1 && m_flSoundTime <= gpGlobals->time)
 	{
 		m_iOn++;
-		EMIT_SOUND( ENT( pev ), CHAN_STATIC, "items/medcharge4.wav", 1.0, ATTN_NORM );
+		EMIT_SOUND(ENT(pev), CHAN_STATIC, "items/medcharge4.wav", 1.0, ATTN_NORM);
 	}
 
 	// gearbox moment: redundant activator null and player check
-	if ( pActivator && pActivator->IsPlayer() )
+	if (pActivator && pActivator->IsPlayer())
 	{
-		pActivator->TakeDamage( pActivator->pev, pActivator->pev, 1.0, DMG_GENERIC );
+		pActivator->TakeDamage(pActivator->pev, pActivator->pev, 1.0, DMG_GENERIC);
 		m_iJuice--;
 		// gearbox moment: if alien mode is active, the amount of liquid in the canister isn't updated
 		// this is probably a bug so i'm going to make it update by default
-		pCanister->SetLiquid( ( m_iJuice / gSkillData.healthchargerCapacity ) * 100 );
+		pCanister->SetLiquid((m_iJuice / gSkillData.healthchargerCapacity) * 100);
 	}
 
-	if ( m_iJuice < 1 )
+	if (m_iJuice < 1)
 	{
 		pev->skin = 1;
 		Off();
