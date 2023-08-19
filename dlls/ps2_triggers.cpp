@@ -320,7 +320,7 @@ class CMultiKillManager : public CMultiManager
 {
 	void ManagerThink(void);
 	CMultiManager* Clone(void);
-	void CMultiKillManager::KillTargets(const char* targetName);
+	void KillTargets(const char* targetName);
 };
 
 LINK_ENTITY_TO_CLASS(multi_kill_manager, CMultiKillManager);
