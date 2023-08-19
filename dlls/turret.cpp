@@ -30,6 +30,7 @@
 #include "monsters.h"
 #include "weapons.h"
 #include "effects.h"
+#include "studio.h"
 
 extern Vector VecBModelOrigin(entvars_t* pevBModel);
 
@@ -1155,6 +1156,10 @@ public:
 	bool TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) override;
 	void EXPORT SentryTouch(CBaseEntity* pOther);
 	void EXPORT SentryDeath();
+
+	bool IsUsingPS2Model(void);
+
+	int m_iShell;
 };
 
 LINK_ENTITY_TO_CLASS(monster_sentry, CSentry);
@@ -1163,6 +1168,7 @@ void CSentry::Precache()
 {
 	CBaseTurret::Precache();
 	PRECACHE_MODEL("models/sentry.mdl");
+	m_iShell = PRECACHE_MODEL("models/shell.mdl");
 }
 
 void CSentry::Spawn()
@@ -1184,6 +1190,17 @@ void CSentry::Spawn()
 	SetTouch(&CSentry::SentryTouch);
 	SetThink(&CSentry::Initialize);
 	pev->nextthink = gpGlobals->time + 0.3;
+
+	if (IsUsingPS2Model())
+	{
+		Vector vecSrc, vecAng;
+		GetAttachment(1, vecSrc, vecAng);
+		m_pEyeGlow = CSprite::SpriteCreate(TURRET_GLOW_SPRITE, vecSrc, false);
+		m_pEyeGlow->SetTransparency(kRenderGlow, 255, 0, 0, 0, kRenderFxNoDissipation);
+		m_pEyeGlow->SetScale(0.5f);
+		m_pEyeGlow->SetAttachment(edict(), 2);
+		m_eyeBrightness = 0;
+	}
 }
 
 void CSentry::Shoot(Vector& vecSrc, Vector& vecDirToEnemy)
@@ -1203,6 +1220,19 @@ void CSentry::Shoot(Vector& vecSrc, Vector& vecDirToEnemy)
 		break;
 	}
 	pev->effects = pev->effects | EF_MUZZLEFLASH;
+
+	if (IsUsingPS2Model())
+	{
+		if (!FBitSet(pev->spawnflags, 0x400))
+		{
+			Vector vecShellVelocity = gpGlobals->v_right * RANDOM_FLOAT(-50, -70) + gpGlobals->v_up * RANDOM_FLOAT(100, 150) + gpGlobals->v_forward * -25;
+			Vector vecAttachSrc, vecAttachAng;
+			GetAttachment(3, vecAttachSrc, vecAttachAng);
+			EjectBrass(vecAttachSrc, vecShellVelocity, m_vecCurAngles.y, m_iShell, TE_BOUNCE_SHELL);
+		}
+
+		m_eyeBrightness = 255;
+	}
 }
 
 bool CSentry::TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType)
@@ -1308,5 +1338,23 @@ void CSentry::SentryDeath()
 	{
 		pev->framerate = 0;
 		SetThink(NULL);
+
+		//TILES: in coop, the sentry will explode here and, if TriggerCondition is AITRIGGER_DEATH, fire target on TriggerTarget
 	}
+}
+
+bool CSentry::IsUsingPS2Model(void)
+{
+	studiohdr_t* pstudiohdr = (studiohdr_t*)GET_MODEL_PTR(ENT(pev));
+
+	if (!pstudiohdr)
+	{
+		ALERT(at_console, "Couldn't get studiohdr for scientist!\n");
+		return false;
+	}
+
+	if (pstudiohdr->bodypartindex == 5856)
+		return true;
+	else
+		return false;
 }
