@@ -1620,6 +1620,10 @@ void CTestHull::CallBuildNodeGraph()
 	BuildNodeGraph();
 	gTouchDisabled = false;
 	// Undo TOUCH HACK
+
+	// quit engine if -buildnodegraphonly is passed in, useful for scripting node graph builds
+	if (0 != g_engfuncs.pfnCheckParm("-buildnodegraphonly", NULL))
+		SERVER_COMMAND("quit\n");
 }
 
 //=========================================================
