@@ -15,6 +15,7 @@
 #include "extdll.h"
 #include "eiface.h"
 #include "util.h"
+#include "client.h"
 #include "game.h"
 #include "filesystem_utils.h"
 
@@ -43,6 +44,8 @@ cvar_t allowmonsters = {"mp_allowmonsters", "0", FCVAR_SERVER};
 cvar_t allow_spectators = {"allow_spectators", "0.0", FCVAR_SERVER}; // 0 prevents players from being spectators
 
 cvar_t mp_chattime = {"mp_chattime", "10", FCVAR_SERVER};
+
+cvar_t sv_allowbunnyhopping = {"sv_allowbunnyhopping", "0", FCVAR_SERVER};
 
 //CVARS FOR SKILL LEVEL SETTINGS
 // Agrunt
@@ -463,6 +466,26 @@ cvar_t sk_player_leg3 = {"sk_player_leg3", "1"};
 // alien mode stuff
 cvar_t sv_alien_alt_melee = { "sv_alien_alt_melee","0" };
 cvar_t sv_alien_gibberish = { "sv_alien_gibberish","0" };
+cvar_t sv_pushable_fixed_tick_fudge = {"sv_pushable_fixed_tick_fudge", "15"};
+
+cvar_t sv_busters = {"sv_busters", "0", FCVAR_SERVER};
+
+static bool SV_InitServer()
+{
+	if (!FileSystem_LoadFileSystem())
+	{
+		return false;
+	}
+
+	if (UTIL_IsValveGameDirectory())
+	{
+		g_engfuncs.pfnServerPrint("This mod has detected that it is being run from a Valve game directory which is not supported\n"
+			"Run this mod from its intended location\n\nThe game will now shut down\n");
+		return false;
+	}
+
+	return true;
+}
 
 // Register your console variables here
 // This gets called one time when the game is initialied
@@ -472,11 +495,13 @@ void GameDLLInit()
 
 	g_psv_gravity = CVAR_GET_POINTER("sv_gravity");
 	g_psv_aim = CVAR_GET_POINTER("sv_aim");
+	g_psv_allow_autoaim = CVAR_GET_POINTER("sv_allow_autoaim");
 	g_footsteps = CVAR_GET_POINTER("mp_footsteps");
 	g_psv_cheats = CVAR_GET_POINTER("sv_cheats");
 
-	if (!FileSystem_LoadFileSystem())
+	if (!SV_InitServer())
 	{
+		g_engfuncs.pfnServerPrint("Error initializing server\n");
 		//Shut the game down as soon as possible.
 		SERVER_COMMAND("quit\n");
 		return;
@@ -505,6 +530,10 @@ void GameDLLInit()
 	CVAR_REGISTER(&allowmonsters);
 
 	CVAR_REGISTER(&mp_chattime);
+
+	CVAR_REGISTER(&sv_busters);
+
+	CVAR_REGISTER(&sv_allowbunnyhopping);
 
 	// REGISTER CVARS FOR SKILL LEVEL STUFF
 	// Agrunt
@@ -924,6 +953,9 @@ void GameDLLInit()
 	// alien mode stuff
 	CVAR_REGISTER(&sv_alien_alt_melee);
 	CVAR_REGISTER(&sv_alien_gibberish);
+	CVAR_REGISTER(&sv_pushable_fixed_tick_fudge);
+
+	InitMapLoadingUtils();
 
 	SERVER_COMMAND("exec skill.cfg\n");
 }
