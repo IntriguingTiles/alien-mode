@@ -120,7 +120,7 @@ bool CWeaponISlave::Deploy()
 {
 	m_pPlayer->m_iHideHUD |= HIDEHUD_HEALTH | HIDEHUD_FLASHLIGHT | HIDEHUD_WEAPONS;
 
-	if (m_pPlayer->pev->weapons & (1 << WEAPON_CROWBAR))
+	if (m_pPlayer->m_WeaponBits & (1 << WEAPON_CROWBAR))
 	{
 		// the only way to obtain other weapons is via impulse 101
 		// therefore if the player has a crowbar, they have other weapons
@@ -133,9 +133,9 @@ bool CWeaponISlave::Deploy()
 	return DefaultDeploy("models/v_slave.mdl", "models/p_crowbar.mdl", SLAVE_IDLE1, "crowbar");
 }
 
-void CWeaponISlave::Holster(int skiplocal /* = 0 */)
+void CWeaponISlave::Holster()
 {
-	if (m_pPlayer->pev->weapons & (1 << WEAPON_CROWBAR))
+	if (m_pPlayer->m_WeaponBits & (1 << WEAPON_CROWBAR))
 		m_pPlayer->m_iHideHUD &= ~(HIDEHUD_HEALTH | HIDEHUD_FLASHLIGHT | HIDEHUD_WEAPONS);
 	m_pPlayer->m_flNextAttack = UTIL_WeaponTimeBase() + 0.5;
 	ClearBeams();
