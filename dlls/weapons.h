@@ -57,7 +57,11 @@ public:
 	int BloodColor() override { return DONT_BLEED; }
 	void Killed(entvars_t* pevAttacker, int iGib) override;
 
+	void KickBack(entvars_t* pevOwner, Vector vecVelocity, float time);
+	void ThrowBack(entvars_t* pevOwner, Vector vecStart, Vector vecVelocity, float time);
+
 	bool m_fRegisteredSound; // whether or not this grenade has issued its DANGER sound to the world sound list yet.
+	bool m_bPickedUp; // gearbox moment: this isn't saved so it's theoretically possible to make an hgrunt throw back the same grenade twice
 };
 
 
@@ -597,7 +601,7 @@ public:
 	void PrimaryAttack( void );
 	void SecondaryAttack( void );
 	bool Deploy( void );
-	void Holster( int skiplocal = 0 );
+	void Holster( );
 	void WeaponIdle( void );
 	void ArmBeam( int side );
 	void BeamGlow( void );
