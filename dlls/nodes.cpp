@@ -1680,11 +1680,11 @@ void CTestHull::BuildNodeGraph()
 	}
 
 	// make sure directories have been made
-	g_pFileSystem->CreateDirHierarchy("maps/graphs", "GAMECONFIG");
+	g_pFileSystem->CreateDirHierarchy("maps/graphs", "GAME");
 
 	const std::string nrpFileName{std::string{"maps/graphs/"} + STRING(gpGlobals->mapname) + ".nrp"};
 
-	FSFile file{nrpFileName.c_str(), "w+", "GAMECONFIG"};
+	FSFile file{nrpFileName.c_str(), "w+", "GAME"};
 
 	if (!file)
 	{ // file error
@@ -2321,13 +2321,13 @@ void CQueuePriority::Heap_SiftUp()
 bool CGraph::FLoadGraph(const char* szMapName)
 {
 	// make sure the directories have been made
-	g_pFileSystem->CreateDirHierarchy("maps/graphs", "GAMECONFIG");
+	g_pFileSystem->CreateDirHierarchy("maps/graphs", "GAME");
 
 	const std::string fileName{std::string{"maps/graphs/"} + szMapName + ".nod"};
 
 	//Note: Allow loading graphs only from the mod directory itself.
 	//Do not allow loading from other games since they may have a different graph format.
-	const auto buffer = FileSystem_LoadFileIntoBuffer(fileName.c_str(), FileContentFormat::Binary, "GAMECONFIG");
+	const auto buffer = FileSystem_LoadFileIntoBuffer(fileName.c_str(), FileContentFormat::Binary, "GAME");
 
 	if (buffer.empty())
 	{
@@ -2495,11 +2495,11 @@ bool CGraph::FSaveGraph(const char* szMapName)
 	}
 
 	// make sure directories have been made
-	g_pFileSystem->CreateDirHierarchy("maps/graphs", "GAMECONFIG");
+	g_pFileSystem->CreateDirHierarchy("maps/graphs", "GAME");
 
 	const std::string fileName{std::string{"maps/graphs/"} + szMapName + ".nod"};
 
-	FSFile file{fileName.c_str(), "wb", "GAMECONFIG"};
+	FSFile file{fileName.c_str(), "wb", "GAME"};
 
 	ALERT(at_aiconsole, "Created: %s\n", fileName.c_str());
 
