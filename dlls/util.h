@@ -598,3 +598,17 @@ struct CallOnDestroy
 		Function();
 	}
 };
+
+// TILES: gearbox turned some brushes into func_walls but they still want you to shoot through some of them
+#define UTIL_TRACELINE_THROUGH_FUNC_WALL(tr, endVec, igmon, igglass)                                                             \
+	{                                                                                                                            \
+		if (!FNullEnt(tr.pHit))                                                                                                  \
+		{                                                                                                                        \
+			CBaseEntity* pHitEnt = CBaseEntity::Instance(tr.pHit);                                                               \
+			if (pHitEnt && strncmp(STRING(pHitEnt->pev->classname), "func_wall", 9) == 0 && (pHitEnt->pev->spawnflags & 4) != 0) \
+			{                                                                                                                    \
+				Vector tmpVector = tr.vecEndPos;                                                                                 \
+				UTIL_TraceLine(tr.vecEndPos, endVec, igmon, igglass, ENT(pHitEnt->pev), &tr);                                    \
+			}                                                                                                                    \
+		}                                                                                                                        \
+	}

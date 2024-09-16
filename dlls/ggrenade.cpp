@@ -366,6 +366,7 @@ void CGrenade::Spawn()
 	UTIL_SetSize(pev, Vector(0, 0, 0), Vector(0, 0, 0));
 
 	pev->dmg = 100;
+	m_bPickedUp = false;
 	m_fRegisteredSound = false;
 }
 
@@ -436,6 +437,43 @@ CGrenade* CGrenade::ShootTimed(entvars_t* pevOwner, Vector vecStart, Vector vecV
 	return pGrenade;
 }
 
+void CGrenade::KickBack(entvars_t* pevOwner, Vector vecVelocity, float time)
+{
+	pev->velocity = vecVelocity;
+	SetTouch(&CGrenade::BounceTouch);
+	UTIL_SetOrigin(pev, pev->origin + Vector(0, 0, 1));
+	pev->flags &= ~FL_ONGROUND;
+	pev->effects &= ~EF_NODRAW;
+	pev->movetype = MOVETYPE_BOUNCE;
+	pev->solid = SOLID_BBOX;
+	pev->owner = ENT(pevOwner);
+	pev->dmgtime = gpGlobals->time + time;
+	SetThink(&CGrenade::TumbleThink);
+	pev->nextthink = gpGlobals->time + 0.1;
+	pev->sequence = RANDOM_LONG(3, 6);
+	pev->framerate = 1.0;
+	pev->frame = 0;
+	m_bPickedUp = false;
+}
+
+void CGrenade::ThrowBack(entvars_t* pevOwner, Vector vecStart, Vector vecVelocity, float time)
+{
+	pev->velocity = vecVelocity;
+	SetTouch(&CGrenade::BounceTouch);
+	UTIL_SetOrigin(pev, vecStart);
+	pev->flags &= ~FL_ONGROUND;
+	pev->effects &= ~EF_NODRAW;
+	pev->movetype = MOVETYPE_BOUNCE;
+	pev->solid = SOLID_BBOX;
+	pev->owner = ENT(pevOwner);
+	pev->dmgtime = gpGlobals->time + time;
+	SetThink(&CGrenade::TumbleThink);
+	pev->nextthink = gpGlobals->time + 0.1;
+	pev->sequence = RANDOM_LONG(3, 6);
+	pev->framerate = 1.0;
+	pev->frame = 0;
+	m_bPickedUp = false;
+}
 
 CGrenade* CGrenade::ShootSatchelCharge(entvars_t* pevOwner, Vector vecStart, Vector vecVelocity)
 {

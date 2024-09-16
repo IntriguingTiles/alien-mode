@@ -111,6 +111,9 @@ public:
 
 	bool m_AllowItemDropping = true;
 
+	EHANDLE m_hUnknown_0x294;
+	float m_fUnknown_0x29c;
+
 	bool Save(CSave& save) override;
 	bool Restore(CRestore& restore) override;
 

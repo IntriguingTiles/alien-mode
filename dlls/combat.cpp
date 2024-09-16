@@ -1232,6 +1232,7 @@ bool CBaseEntity::FVisible(CBaseEntity* pEntity)
 	vecTargetOrigin = pEntity->EyePosition();
 
 	UTIL_TraceLine(vecLookerOrigin, vecTargetOrigin, ignore_monsters, ignore_glass, ENT(pev) /*pentIgnore*/, &tr);
+	UTIL_TRACELINE_THROUGH_FUNC_WALL(tr, vecTargetOrigin, ignore_monsters, ignore_glass)
 
 	if (tr.flFraction != 1.0)
 	{
@@ -1255,6 +1256,7 @@ bool CBaseEntity::FVisible(const Vector& vecOrigin)
 	vecLookerOrigin = EyePosition(); //look through the caller's 'eyes'
 
 	UTIL_TraceLine(vecLookerOrigin, vecOrigin, ignore_monsters, ignore_glass, ENT(pev) /*pentIgnore*/, &tr);
+	UTIL_TRACELINE_THROUGH_FUNC_WALL(tr, vecOrigin, ignore_monsters, ignore_glass)
 
 	if (tr.flFraction != 1.0)
 	{
@@ -1395,6 +1397,7 @@ void CBaseEntity::FireBullets(unsigned int cShots, Vector vecSrc, Vector vecDirS
 
 		vecEnd = vecSrc + vecDir * flDistance;
 		UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(pev) /*pentIgnore*/, &tr);
+		UTIL_TRACELINE_THROUGH_FUNC_WALL(tr, vecEnd, dont_ignore_monsters, dont_ignore_glass)
 
 		if (iTracerFreq != 0 && (tracerCount++ % iTracerFreq) == 0)
 		{
