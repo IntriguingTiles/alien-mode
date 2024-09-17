@@ -144,10 +144,6 @@ bool CHudMenu::Draw(float flTime)
 	if (gViewPort && gViewPort->IsScoreBoardVisible())
 		return true;
 
-	SCREENINFO screenInfo;
-	screenInfo.iSize = sizeof( SCREENINFO );
-	gEngfuncs.pfnGetScreenInfo( &screenInfo );
-
 	// draw the menu, along the left-hand side of the screen
 
 	// count the number of newlines
@@ -159,10 +155,8 @@ bool CHudMenu::Draw(float flTime)
 			nlc++;
 	}
 
-	int nFontHeight = V_max(12, screenInfo.iCharHeight);
-
 	// center it
-	int y = (ScreenHeight/2) - ((nlc/2)* nFontHeight) - (3 * nFontHeight + nFontHeight / 3); // make sure it is above the say text
+	int y = (ScreenHeight / 2) - ((nlc / 2) * 12) - 40; // make sure it is above the say text
 
 	menu_r = 255;
 	menu_g = 255;
@@ -182,7 +176,7 @@ bool CHudMenu::Draw(float flTime)
 		{
 			menu_ralign = false;
 			menu_x = 20;
-			y += nFontHeight;
+			y += (12);
 
 			sptr++;
 		}

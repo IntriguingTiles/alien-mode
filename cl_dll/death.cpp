@@ -80,7 +80,7 @@ bool CHudDeathNotice::Init()
 
 	HOOK_MESSAGE(DeathMsg);
 
-	CVAR_CREATE("hud_deathnotice_time", "6", FCVAR_ARCHIVE);
+	CVAR_CREATE("hud_deathnotice_time", "6", 0);
 
 	return true;
 }
@@ -101,12 +101,7 @@ bool CHudDeathNotice::VidInit()
 
 bool CHudDeathNotice::Draw(float flTime)
 {
-	int x, y, r, g, b, texty;
-
-	int gap = 20;
-
-	Rect sprite = gHUD.GetSpriteRect(m_HUD_d_skull);
-	gap = sprite.bottom - sprite.top;
+	int x, y, r, g, b;
 
 	for (int i = 0; i < MAX_DEATHNOTICES; i++)
 	{
@@ -127,12 +122,10 @@ bool CHudDeathNotice::Draw(float flTime)
 		if (gViewPort && gViewPort->AllowedToPrintText())
 		{
 			// Draw the death notice
-			y = DEATHNOTICE_TOP + 2 + (gap * i);
-
-			texty = y + 4;
+			y = DEATHNOTICE_TOP + 2 + (20 * i); //!!!
 
 			int id = (rgDeathNoticeList[i].iId == -1) ? m_HUD_d_skull : rgDeathNoticeList[i].iId;
-			x = ScreenWidth - ConsoleStringLen(rgDeathNoticeList[i].szVictim) - (gHUD.GetSpriteRect(id).right - gHUD.GetSpriteRect(id).left) - 4;
+			x = ScreenWidth - ConsoleStringLen(rgDeathNoticeList[i].szVictim) - (gHUD.GetSpriteRect(id).right - gHUD.GetSpriteRect(id).left);
 
 			if (!rgDeathNoticeList[i].iSuicide)
 			{
@@ -141,7 +134,7 @@ bool CHudDeathNotice::Draw(float flTime)
 				// Draw killers name
 				if (rgDeathNoticeList[i].KillerColor)
 					gEngfuncs.pfnDrawSetTextColor(rgDeathNoticeList[i].KillerColor[0], rgDeathNoticeList[i].KillerColor[1], rgDeathNoticeList[i].KillerColor[2]);
-				x = 5 + DrawConsoleString(x, texty, rgDeathNoticeList[i].szKiller);
+				x = 5 + DrawConsoleString(x, y, rgDeathNoticeList[i].szKiller);
 			}
 
 			r = 255;
@@ -165,7 +158,7 @@ bool CHudDeathNotice::Draw(float flTime)
 			{
 				if (rgDeathNoticeList[i].VictimColor)
 					gEngfuncs.pfnDrawSetTextColor(rgDeathNoticeList[i].VictimColor[0], rgDeathNoticeList[i].VictimColor[1], rgDeathNoticeList[i].VictimColor[2]);
-				x = DrawConsoleString(x, texty, rgDeathNoticeList[i].szVictim);
+				x = DrawConsoleString(x, y, rgDeathNoticeList[i].szVictim);
 			}
 		}
 	}
