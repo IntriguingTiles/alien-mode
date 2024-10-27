@@ -103,11 +103,6 @@ bool CHudDeathNotice::Draw(float flTime)
 {
 	int x, y, r, g, b;
 
-	SCREENINFO screenInfo;
-	screenInfo.iSize = sizeof(SCREENINFO);
-	gEngfuncs.pfnGetScreenInfo(&screenInfo);
-	gap = V_max(gap, screenInfo.iCharHeight);
-
 	for (int i = 0; i < MAX_DEATHNOTICES; i++)
 	{
 		if (rgDeathNoticeList[i].iId == 0)
