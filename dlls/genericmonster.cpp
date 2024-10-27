@@ -212,7 +212,7 @@ bool CGenericMonster::KeyValue( KeyValueData *pkvd )
 	}
 	else
 	{
-		CBaseMonster::KeyValue( pkvd );
+		return CBaseMonster::KeyValue( pkvd );
 	}
 }
 
