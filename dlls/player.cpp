@@ -4883,7 +4883,7 @@ void CDeadHEV::Spawn()
 	{
 		ALERT(at_console, "Dead hevsuit with bad pose\n");
 		pev->sequence = 0;
-		pev->effects = EF_BRIGHTFIELD;
+		// pev->effects = EF_BRIGHTFIELD;
 	}
 
 	// Corpses have less health
