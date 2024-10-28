@@ -385,11 +385,10 @@ void CFuncTank::StopControl()
 	if (!m_pController)
 		return;
 
+	m_pController->m_iHideHUD &= ~HIDEHUD_WEAPONS;
 	m_pController->EquipWeapon();
 
 	ALERT(at_console, "stopped using TANK\n");
-
-	m_pController->m_iHideHUD &= ~HIDEHUD_WEAPONS;
 
 	pev->nextthink = 0;
 	m_pController = NULL;
