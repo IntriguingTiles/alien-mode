@@ -496,7 +496,7 @@ bool CHudMessage::MsgFunc_HudText(const char* pszName, int iSize, void* pbuf)
 	char* pString = READ_STRING();
 
 	bool bIsEnding = false;
-	const char* HL1_ENDING_STR = "END3";
+	const char* HL1_ENDING_STR = "THANKS2";
 
 	if (strlen(pString) == strlen(HL1_ENDING_STR) && strcmp(HL1_ENDING_STR, pString) == 0)
 	{
