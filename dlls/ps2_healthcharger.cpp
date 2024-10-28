@@ -593,10 +593,12 @@ void CWallHealthNew::Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE
 	if (!pActivator->IsPlayer())
 		return;
 
+	CBasePlayer* pPlayer = (CBasePlayer*)pActivator;
+
 	if ((pActivator->pev->origin - pev->origin).Length2D() > 48.0)
 		return;
 
-	if (m_iJuice <= 0 || (!(pActivator->pev->weapons & (1 << WEAPON_SUIT))))
+	if (m_iJuice <= 0 || (!pPlayer->HasSuit()))
 	{
 		if (m_flSoundTime <= gpGlobals->time)
 		{
